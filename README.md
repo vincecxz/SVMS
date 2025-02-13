@@ -97,5 +97,5 @@ Password: admin123
 - Prepared SQL statements
 ---
 <div align="center">
-    <p>Made with ❤️ for CTU Student Affairs Office</p>
+    <p>Made with ❤️ by <a href="https://github.com/vincecxz">Astro</a> for CTU Student Affairs Office</p>
 </div> 
