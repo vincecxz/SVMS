@@ -112,7 +112,7 @@ $result = mysqli_query($conn, $query);
     <!-- SweetAlert2 -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
 </head>
-<body class="hold-transition sidebar-mini">
+<body class="hold-transition sidebar-mini layout-fixed">
     <div class="wrapper">
         <?php include '../includes/admin/navbar.php'; ?>
         <?php include '../includes/admin/sidebar.php'; ?>
@@ -135,6 +135,12 @@ $result = mysqli_query($conn, $query);
                     </div>
                 </div>
             </section>
+            
+                <!-- Floating Add Button -->
+                <button type="button" class="btn-float"  data-toggle="modal" data-target="#addStudentModal">
+                <i class="fas fa-plus fa-lg"></i>
+                <span class="btn-float-label">Add Student</span>
+            </button>
 
             <!-- Main content -->
             <section class="content">
@@ -149,9 +155,9 @@ $result = mysqli_query($conn, $query);
                                             <button type="button" class="btn btn-secondary btn-sm mr-2" data-toggle="modal" data-target="#importStudentModal">
                                                 <i class="fas fa-file-import"></i> Import Students
                                             </button>
-                                            <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#addStudentModal">
+                                            <!-- <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#addStudentModal">
                                                 <i class="fas fa-user-plus"></i> Add Student
-                                            </button>
+                                            </button> -->
                                         </div>
                                     </div>
                                 </div>
@@ -178,7 +184,7 @@ $result = mysqli_query($conn, $query);
                                                             <button type="button" class="btn btn-warning btn-sm" onclick="editStudent('<?php echo $row['id_number']; ?>')" title="Edit">
                                                                 <i class="fas fa-pencil-alt"></i>
                                                             </button>
-                                                            <button type="button" class="btn btn-success btn-sm" onclick="generateGoodmoral('<?php echo $row['id_number']; ?>')" title="Generate Good Moral">
+                                                            <button type="button" class="btn btn-success btn-sm" onclick="showGoodMoralModal('<?php echo $row['id']; ?>', '<?php echo $row['full_name']; ?>')" title="Generate Good Moral">
                                                                 <i class="fas fa-file-alt"></i>
                                                             </button>
                                                         </div>
@@ -385,6 +391,28 @@ $result = mysqli_query($conn, $query);
                         <button type="submit" class="btn btn-primary">Import Students</button>
                     </div>
                 </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- View Sanctions Modal -->
+    <div class="modal fade" id="viewSanctionsModal">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-danger">
+                    <h5 class="modal-title">Active Sanctions</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div id="sanctionsContent">
+                        <!-- Sanctions will be loaded here -->
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
             </div>
         </div>
     </div>
@@ -776,6 +804,89 @@ $result = mysqli_query($conn, $query);
                     }
                 });
             });
+
+            // Handle purpose selection change
+            $('#purpose').change(function() {
+                if ($(this).val() === 'Others') {
+                    $('#otherPurposeGroup').show();
+                    $('#other_purpose').prop('required', true);
+                } else {
+                    $('#otherPurposeGroup').hide();
+                    $('#other_purpose').prop('required', false);
+                }
+            });
+
+            // Handle good moral form submission
+            $('#goodMoralForm').on('submit', function(e) {
+                e.preventDefault();
+                
+                // Show loading state
+                Swal.fire({
+                    title: 'Generating Certificate',
+                    text: 'Please wait...',
+                    allowOutsideClick: false,
+                    didOpen: () => {
+                        Swal.showLoading();
+                    }
+                });
+
+                // Get form data
+                const formData = {
+                    student_id: $('#student_id').val(),
+                    purpose: $('#purpose').val() === 'Others' ? $('#other_purpose').val() : $('#purpose').val(),
+                    school_year: $('#school_year').val()
+                };
+
+                // Submit form using AJAX
+                $.ajax({
+                    url: 'generate_goodmoral.php',
+                    method: 'POST',
+                    data: formData,
+                    xhrFields: {
+                        responseType: 'blob'
+                    },
+                    success: function(response) {
+                        Swal.close();
+                        
+                        // Create blob URL for preview
+                        const blob = new Blob([response], { type: 'application/pdf' });
+                        const url = window.URL.createObjectURL(blob);
+                        
+                        // Show preview modal
+                        $('#pdfPreviewFrame').attr('src', url);
+                        $('#generateGoodMoralModal').modal('hide');
+                        $('#pdfPreviewModal').modal('show');
+                        
+                        // Handle download button click
+                        $('#downloadPdf').off('click').on('click', function() {
+                            const a = document.createElement('a');
+                            a.href = url;
+                            a.download = 'good_moral_certificate.pdf';
+                            document.body.appendChild(a);
+                            a.click();
+                            window.URL.revokeObjectURL(url);
+                            document.body.removeChild(a);
+                            $('#pdfPreviewModal').modal('hide');
+                        });
+                        
+                        // Clean up blob URL when modal is closed
+                        $('#pdfPreviewModal').on('hidden.bs.modal', function() {
+                            window.URL.revokeObjectURL(url);
+                            $('#goodMoralForm')[0].reset();
+                        });
+                    },
+                    error: function(xhr, status, error) {
+                        Swal.close();
+                        console.error('Error:', error);
+                        
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: 'Failed to generate certificate. Please try again.'
+                        });
+                    }
+                });
+            });
         });
 
         function viewStudent(studentId) {
@@ -869,9 +980,210 @@ $result = mysqli_query($conn, $query);
             });
         }
 
-        function generateGoodmoral(studentId) {
-            window.location.href = `generate_goodmoral.php?id=${studentId}`;
+        function showGoodMoralModal(studentId, studentName) {
+            // Check for active sanctions first
+            $.ajax({
+                url: 'check_student_sanctions.php',
+                method: 'POST',
+                data: { student_id: studentId },
+                dataType: 'json',
+                success: function(response) {
+                    if (response.has_pending_sanctions) {
+                        // Show warning modal with sanction details
+                        Swal.fire({
+                            title: 'Cannot Generate Good Moral',
+                            html: `
+                                <div class="text-left">
+                                    <p class="text-danger"><i class="fas fa-exclamation-triangle"></i> Student has active sanctions that need to be resolved first.</p>
+                                    <button type="button" class="btn btn-danger btn-block mt-3" 
+                                        onclick="viewSanctions('${studentId}')">
+                                        <i class="fas fa-eye"></i> View Sanctions
+                                    </button>
+                                </div>
+                            `,
+                            icon: 'warning',
+                            showConfirmButton: false,
+                            showCloseButton: true
+                        });
+                    } else {
+                        // Show success message and proceed with good moral generation
+                        Swal.fire({
+                            title: 'Good Moral Certificate',
+                            html: `
+                                <div class="text-left">
+                                    <p class="text-success"><i class="fas fa-check-circle"></i> Student has no active sanctions.</p>
+                                    
+                                </div>
+                            `,
+                            icon: 'success',
+                           
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                // Proceed with showing the good moral form
+                                $('#student_id').val(studentId);
+                                $('#student_name').val(studentName);
+                                $('#generateGoodMoralModal').modal('show');
+                            }
+                        });
+                    }
+                },
+                error: function() {
+                    Swal.fire({
+                        title: 'Error',
+                        text: 'Failed to check student sanctions. Please try again.',
+                        icon: 'error'
+                    });
+                }
+            });
+        }
+
+        function viewSanctions(studentId) {
+            // Close the previous SweetAlert
+            Swal.close();
+            
+            // Show the sanctions modal
+            $('#viewSanctionsModal').modal('show');
+            
+            // Load sanctions content
+            $.ajax({
+                url: 'get_student_sanctions.php',
+                method: 'POST',
+                data: { student_id: studentId },
+                success: function(response) {
+                    $('#sanctionsContent').html(response);
+                },
+                error: function() {
+                    $('#sanctionsContent').html(
+                        '<div class="alert alert-danger">' +
+                        '<i class="fas fa-exclamation-circle"></i> Failed to load sanction details.' +
+                        '</div>'
+                    );
+                }
+            });
         }
     </script>
+    <style>
+           /* Floating Action Button */
+    .btn-float {
+        position: fixed !important;
+        bottom: 30px !important;
+        right: 30px !important;
+        width: 60px !important;
+        height: 60px !important;
+        background-color: #00b0ff !important;
+        border: none !important;
+        border-radius: 50% !important;
+        color: white !important;
+        font-size: 24px !important;
+        cursor: pointer !important;
+        box-shadow: 0 4px 10px rgba(0, 176, 255, 0.3) !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        transition: all 0.3s ease !important;
+        z-index: 1050 !important;
+        outline: none !important;
+    }
+
+    .btn-float:hover {
+        transform: scale(1.1) !important;
+        box-shadow: 0 6px 15px rgba(0, 176, 255, 0.4) !important;
+    }
+
+    .btn-float:active {
+        transform: scale(0.95) !important;
+    }
+
+    .btn-float i {
+        transition: all 0.3s ease !important;
+    }
+
+    .btn-float-label {
+        position: absolute !important;
+        right: 70px !important;
+        background-color: rgba(0, 0, 0, 0.8) !important;
+        color: white !important;
+        padding: 8px 12px !important;
+        border-radius: 4px !important;
+        font-size: 14px !important;
+        font-weight: 500 !important;
+        opacity: 0 !important;
+        visibility: hidden !important;
+        transition: all 0.3s ease !important;
+        white-space: nowrap !important;
+    }
+
+    .btn-float:hover .btn-float-label {
+        opacity: 1 !important;
+        visibility: visible !important;
+        right: 75px !important;
+    }
+
+    .btn-float-label:after {
+        content: '' !important;
+        position: absolute !important;
+        right: -5px !important;
+        top: 50% !important;
+        transform: translateY(-50%) !important;
+        width: 0 !important;
+        height: 0 !important;
+        border-top: 5px solid transparent !important;
+        border-bottom: 5px solid transparent !important;
+        border-left: 5px solid rgba(0, 0, 0, 0.8) !important;
+    }
+
+    @media (max-width: 768px) {
+        .btn-float {
+            width: 50px !important;
+            height: 50px !important;
+            bottom: 20px !important;
+            right: 20px !important;
+            font-size: 20px !important;
+        }
+    }
+
+    /* PDF Preview Modal Styles */
+    #pdfPreviewModal .modal-dialog {
+        max-width: 90%;
+        margin: 1.75rem auto;
+    }
+
+    #pdfPreviewModal .modal-content {
+        height: 90vh;
+    }
+
+    #pdfPreviewModal .modal-body {
+        padding: 1rem;
+        background-color: #f8f9fa;
+    }
+
+    #pdfPreviewContainer {
+        background-color: #fff;
+        border: 1px solid #dee2e6;
+        border-radius: 4px;
+        box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+
+    #pdfPreviewFrame {
+        background-color: #fff;
+    }
+
+    #pdfPreviewModal .modal-footer {
+        border-top: 1px solid #dee2e6;
+        padding: 1rem;
+        background-color: #fff;
+    }
+
+    #downloadPdf {
+        background-color: #007bff;
+        border-color: #007bff;
+        padding: 0.5rem 1.5rem;
+    }
+
+    #downloadPdf:hover {
+        background-color: #0056b3;
+        border-color: #0056b3;
+    }
+    </style>
 </body>
 </html> 

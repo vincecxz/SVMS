@@ -18,7 +18,7 @@ check_auth('admin'); // Require admin role
     <!-- Theme style -->
     <link rel="stylesheet" href="../dist/css/adminlte.min.css">
 </head>
-<body class="hold-transition sidebar-mini">
+<body class="hold-transition sidebar-mini layout-fixed">
 <div class="wrapper">
     <?php 
     include '../includes/admin/navbar.php';

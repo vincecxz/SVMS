@@ -14,7 +14,7 @@
     <!-- Sweet Alert -->
     <link rel="stylesheet" href="../plugins/sweetalert2/sweetalert2.min.css">
 </head>
-<body class="hold-transition sidebar-mini">
+<body class="hold-transition sidebar-mini layout-fixed">
 <div class="wrapper">
     <?php 
     include '../includes/admin/navbar.php';

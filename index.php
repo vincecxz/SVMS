@@ -76,6 +76,8 @@
         .input-group {
             margin-bottom: 1.8rem !important;
             flex-direction: row-reverse;
+         
+            
         }
 
         .form-control {
@@ -85,6 +87,7 @@
             padding: 10px 20px 10px 50px;
             font-size: 1.1rem;
             transition: all 0.3s ease;
+     
         }
 
         .form-control:focus {

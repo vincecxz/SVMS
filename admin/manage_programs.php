@@ -29,7 +29,7 @@ $result = mysqli_query($conn, $query);
     <!-- SweetAlert2 -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
 </head>
-<body class="hold-transition sidebar-mini">
+<body class="hold-transition sidebar-mini layout-fixed">
     <div class="wrapper">
         <?php include '../includes/admin/navbar.php'; ?>
         <?php include '../includes/admin/sidebar.php'; ?>

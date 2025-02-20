@@ -8,6 +8,9 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit;
 }
 
+// Set UTF-8 connection charset
+mysqli_set_charset($conn, "utf8mb4");
+
 if (!isset($_FILES['import_file']) || $_FILES['import_file']['error'] !== UPLOAD_ERR_OK) {
     echo json_encode(['success' => false, 'error' => 'Please select a valid file to import']);
     exit;
@@ -26,11 +29,21 @@ try {
             throw new Exception('Failed to open CSV file');
         }
 
+        // Set internal encoding to UTF-8
+        mb_internal_encoding('UTF-8');
+        
         // Skip UTF-8 BOM if present
         fgets($handle, 4) === "\xEF\xBB\xBF" ? rewind($handle) : rewind($handle);
         
         // Read and store all rows
         while (($data = fgetcsv($handle)) !== false) {
+            // Convert encoding to UTF-8 if needed
+            $data = array_map(function($cell) {
+                // Detect encoding and convert to UTF-8 if necessary
+                $encoding = mb_detect_encoding($cell, ['UTF-8', 'ISO-8859-1', 'Windows-1252'], true);
+                return $encoding === 'UTF-8' ? $cell : mb_convert_encoding($cell, 'UTF-8', $encoding);
+            }, $data);
+            
             // Skip completely empty rows
             if (empty(array_filter($data, function($cell) {
                 return trim($cell) !== '';
@@ -52,8 +65,51 @@ try {
         }
         require __DIR__ . '/../vendor/autoload.php';
         
-        $spreadsheet = \PhpOffice\PhpSpreadsheet\IOFactory::load($file['tmp_name']);
-        $rows = $spreadsheet->getActiveSheet()->toArray();
+        $reader = \PhpOffice\PhpSpreadsheet\IOFactory::createReader(
+            $ext === 'xlsx' ? 'Xlsx' : 'Xls'
+        );
+        $reader->setInputEncoding('UTF-8');
+        
+        // Read cell values as they are entered (raw)
+        if ($ext === 'xlsx') {
+            $reader->setReadDataOnly(true);
+            $reader->setPreCalculateFormulas(false);
+        }
+        
+        $spreadsheet = $reader->load($file['tmp_name']);
+        $worksheet = $spreadsheet->getActiveSheet();
+        
+        // Get the highest row and column numbers referenced in the worksheet
+        $highestRow = $worksheet->getHighestRow();
+        $highestColumn = $worksheet->getHighestColumn();
+        
+        // Convert the rows to array while preserving raw values
+        $rows = [];
+        for ($row = 1; $row <= $highestRow; $row++) {
+            $rowData = [];
+            for ($col = 'A'; $col <= $highestColumn; $col++) {
+                $cell = $worksheet->getCell($col . $row);
+                
+                // Get the raw value for sections (column D)
+                if ($col === 'D') {
+                    $value = $cell->getValue();
+                    // If it's a date value, get the original entered text
+                    if (PHPExcel_Shared_Date::isDateTime($cell)) {
+                        $value = $cell->getOldCalculatedValue();
+                    }
+                } else {
+                    $value = $cell->getValue();
+                }
+                
+                if (is_string($value)) {
+                    $encoding = mb_detect_encoding($value, ['UTF-8', 'ISO-8859-1', 'Windows-1252'], true);
+                    $value = $encoding === 'UTF-8' ? $value : mb_convert_encoding($value, 'UTF-8', $encoding);
+                }
+                
+                $rowData[] = $value;
+            }
+            $rows[] = $rowData;
+        }
     }
 
     // Store original headers for validation
@@ -92,7 +148,11 @@ try {
 
     // Initialize counters
     $imported = 0;
+    $skipped = 0;
     $errors = [];
+    $validation_results = [];
+    $new_records = [];
+    $existing_records = [];
 
     // Get valid programs
     $query = "SELECT id, code FROM programs";
@@ -105,17 +165,22 @@ try {
         $programs[$row['code']] = $row['id'];
     }
 
-    // Get valid sections
+    // Get valid sections and prepare them for comparison
     $query = "SELECT section FROM sections";
     $result = mysqli_query($conn, $query);
     if (!$result) {
         throw new Exception('Failed to fetch sections: ' . mysqli_error($conn));
     }
     $valid_sections = [];
+    $valid_section_patterns = [];
     while ($row = mysqli_fetch_assoc($result)) {
         $valid_sections[] = $row['section'];
+        // Create pattern by replacing any hyphen with an optional hyphen
+        $pattern = str_replace('-', '-?', $row['section']);
+        $valid_section_patterns[] = $pattern;
     }
 
+    // First pass: Validate all records and check for duplicates
     foreach ($rows as $index => $row) {
         // Skip empty rows
         if (empty(array_filter($row))) {
@@ -138,44 +203,88 @@ try {
         $id_number = trim($row[0]);
         $full_name = trim($row[1]);
         $program_code = strtoupper(trim($row[2]));
-        $section = trim($row[3]);
+        // Trim both spaces and quotes from section
+        $section = trim(trim($row[3]), '"\'');
         $contact_number = trim($row[4]);
         $email = trim($row[5]);
 
-        // Debug log
-        error_log("Processing row $row_num: ID=$id_number, Name=$full_name, Program=$program_code, Section=$section");
+        // Store record for validation
+        $record = [
+            'row_num' => $row_num,
+            'id_number' => $id_number,
+            'full_name' => htmlspecialchars($full_name, ENT_QUOTES, 'UTF-8'),
+            'program_code' => $program_code,
+            'section' => $section, // Store the cleaned section without quotes
+            'contact_number' => $contact_number,
+            'email' => $email
+        ];
 
-        // Validate required fields
+        // Basic validation
+        $validation_error = false;
+        
+        // Validate required fields (contact_number removed from required fields)
         if (empty($id_number) || empty($full_name) || empty($program_code) || empty($section) || empty($email)) {
-            $errors[] = "Row $row_num: Required fields cannot be empty";
-            continue;
+            $errors[] = "Row $row_num: Required fields (ID Number, Full Name, Program, Section, Email) cannot be empty";
+            $validation_error = true;
         }
 
         // Validate program
         if (!isset($programs[$program_code])) {
             $errors[] = "Row $row_num: Invalid program code '$program_code'. Valid programs are: " . implode(', ', array_keys($programs));
-            continue;
+            $validation_error = true;
         }
 
-        // Validate section
-        if (!in_array($section, $valid_sections)) {
+        // Validate section with more flexible matching
+        $section_valid = false;
+        // Clean and normalize the input section
+        $clean_section = trim(str_replace(['"', "'"], '', $section));
+        $normalized_section = preg_replace('/\s*-\s*/', '', $clean_section); // Remove hyphens and surrounding spaces
+
+        foreach ($valid_sections as $valid_section) {
+            // Clean and normalize the valid section
+            $clean_valid = trim(str_replace(['"', "'"], '', $valid_section));
+            $normalized_valid = preg_replace('/\s*-\s*/', '', $clean_valid);
+
+            // Try different matching patterns
+            if (
+                strcasecmp($normalized_section, $normalized_valid) === 0 || // Match without hyphens
+                strcasecmp($clean_section, $clean_valid) === 0 || // Match with hyphens
+                strcasecmp($section, $valid_section) === 0 // Direct match
+            ) {
+                $section_valid = true;
+                // Use the cleaned section format (without quotes)
+                $record['section'] = $clean_valid;
+                break;
+            }
+        }
+        
+        if (!$section_valid) {
             $errors[] = "Row $row_num: Invalid section '$section'. Valid sections are: " . implode(', ', $valid_sections);
-            continue;
+            $validation_error = true;
         }
 
         // Validate email format
         if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
             $errors[] = "Row $row_num: Invalid email format for '$email'";
+            $validation_error = true;
+        }
+
+        // Validate contact number only if provided (now optional)
+        if (!empty($contact_number)) {
+            if (!preg_match('/^09\d{9}$/', $contact_number)) {
+                $errors[] = "Row $row_num: Invalid contact number format for '$contact_number'. Must be in format 09XXXXXXXXX";
+                $validation_error = true;
+            }
+        } else {
+            // Set contact_number to NULL if empty
+            $record['contact_number'] = null;
+        }
+
+        if ($validation_error) {
             continue;
         }
 
-        // Validate contact number if provided
-        if (!empty($contact_number) && !preg_match('/^09\d{9}$/', $contact_number)) {
-            $errors[] = "Row $row_num: Invalid contact number format for '$contact_number'. Must be in format 09XXXXXXXXX";
-            continue;
-        }
-
-        // Check for duplicate ID number or email
+        // Check for duplicate ID number or email in database
         $check_query = "SELECT id_number, email FROM students WHERE id_number = ? OR email = ?";
         $stmt = mysqli_prepare($conn, $check_query);
         if (!$stmt) {
@@ -191,15 +300,29 @@ try {
         if (mysqli_num_rows($check_result) > 0) {
             $existing = mysqli_fetch_assoc($check_result);
             if ($existing['id_number'] === $id_number) {
-                $errors[] = "Row $row_num: Student with ID number $id_number already exists";
+                $existing_records[] = "Row $row_num: Student with ID number $id_number";
             } else {
-                $errors[] = "Row $row_num: Student with email $email already exists";
+                $existing_records[] = "Row $row_num: Student with email $email";
             }
-            continue;
+            $validation_results[$row_num] = 'existing';
+        } else {
+            $new_records[] = $record;
+            $validation_results[$row_num] = 'new';
         }
+    }
 
-        // Insert student
-        $program_id = $programs[$program_code];
+    // Prepare validation summary
+    $total_records = count($new_records) + count($existing_records);
+    $validation_summary = [
+        'total_records' => $total_records,
+        'new_records' => count($new_records),
+        'existing_records' => count($existing_records),
+        'error_records' => count($errors)
+    ];
+
+    // Second pass: Insert new records
+    foreach ($new_records as $record) {
+        $program_id = $programs[$record['program_code']];
         $insert_query = "INSERT INTO students (id_number, full_name, program_id, section, contact_number, email) 
                         VALUES (?, ?, ?, ?, ?, ?)";
         $stmt = mysqli_prepare($conn, $insert_query);
@@ -207,25 +330,52 @@ try {
             throw new Exception('Failed to prepare insert query: ' . mysqli_error($conn));
         }
 
-        mysqli_stmt_bind_param($stmt, "ssisss", $id_number, $full_name, $program_id, $section, $contact_number, $email);
+        mysqli_stmt_bind_param($stmt, "ssisss", 
+            $record['id_number'], 
+            $record['full_name'], 
+            $program_id, 
+            $record['section'], 
+            $record['contact_number'], 
+            $record['email']
+        );
         
         if (mysqli_stmt_execute($stmt)) {
             $imported++;
-            error_log("Successfully imported student: $id_number");
+            error_log("Successfully imported student: " . $record['id_number']);
         } else {
-            $errors[] = "Row $row_num: Failed to import student. Error: " . mysqli_stmt_error($stmt);
+            $errors[] = "Row " . $record['row_num'] . ": Failed to import student. Error: " . mysqli_stmt_error($stmt);
         }
     }
 
-    // Prepare response
+    // Prepare detailed response
     $response = [
         'success' => true,
-        'message' => "$imported students imported successfully"
+        'summary' => [
+            'total_processed' => $total_records,
+            'imported' => $imported,
+            'skipped' => count($existing_records),
+            'errors' => count($errors)
+        ],
+        'message' => sprintf(
+            "Processed %d records: %d imported successfully, %d existing records skipped",
+            $total_records,
+            $imported,
+            count($existing_records)
+        )
     ];
 
+    if (!empty($existing_records)) {
+        $response['existing_records'] = [
+            'message' => 'The following records already exist in the database:',
+            'details' => $existing_records
+        ];
+    }
+
     if (!empty($errors)) {
-        $response['warning'] = "Some records could not be imported:";
-        $response['errors'] = $errors;
+        $response['errors'] = [
+            'message' => 'The following records had errors:',
+            'details' => $errors
+        ];
     }
 
     echo json_encode($response);

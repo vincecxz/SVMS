@@ -62,7 +62,7 @@ try {
 
     // First sample data row with first note
     $dataRow1 = array_merge(
-        ['132100', 'Juan Dela Cruz', 'BSIT', '1A', '09123456789', 'juan.delacruz@example.com'],
+        ['132100', 'Juan Dela Cruz', 'BSIT', '"1-1', '09123456789', 'juan.delacruz@example.com'],
         createEmptyColumns(7),
         ['1. All fields are required except Contact Number']
     );
@@ -70,7 +70,7 @@ try {
 
     // Second sample data row with second note
     $dataRow2 = array_merge(
-        ['132101', 'Maria Garcia', 'BSCS', '2A', '09987654321', 'maria.garcia@example.com'],
+        ['132101', 'Maria Garcia', 'BSED-MATH', '2A', '09987654321', 'maria.garcia@example.com'],
         createEmptyColumns(7),
         ['2. Valid Programs: ' . implode(', ', $programs)]
     );
@@ -89,13 +89,18 @@ try {
     $rows[] = array_merge(
         $emptyDataColumns,
         createEmptyColumns(7),
-        ['4. Contact number format: 09XXXXXXXXX']
+        ['4. Contact number format: 09XXXXXXXXX (optional)']
     );
 
     $rows[] = array_merge(
         $emptyDataColumns,
         createEmptyColumns(7),
         ['5. Email must be valid format']
+    );
+    $rows[] = array_merge(
+        $emptyDataColumns,
+        createEmptyColumns(7),
+        ['6. "Use " " if the section has a hyphen']
     );
 
     // Write all rows to the CSV file

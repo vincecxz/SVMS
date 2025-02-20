@@ -30,24 +30,14 @@
                 <li class="nav-header">MANAGEMENT</li>
                 
                 <!-- Student -->
-                <li class="nav-item has-treeview">
-                    <a href="#" class="nav-link">
+                <li class="nav-item">
+                    <a href="student_masterlist.php" class="nav-link">
                         <i class="nav-icon fas fa-user-graduate"></i>
-                        <p>
-                            Student
-                            <i class="fas fa-angle-left right"></i>
-                        </p>
+                        <p>Student</p>
                     </a>
-                    <ul class="nav nav-treeview">
-                        <li class="nav-item">
-                            <a href="student_masterlist.php" class="nav-link">
-                                <i class="far fa-circle nav-icon"></i>
-                                <p>Masterlist (Good Moral)</p>
-                            </a>
-                        </li>
-                    </ul>
                 </li>
 
+               
                 <!-- Programs & Sections -->
                 <li class="nav-item">
                     <a href="manage_programs.php" class="nav-link">
@@ -61,18 +51,35 @@
                 
                 <!-- Report Student Violation -->
                 <li class="nav-item">
-                    <a href="report_violation.php" class="nav-link">
+                    <a href="report_list.php" class="nav-link">
                         <i class="nav-icon fas fa-exclamation-triangle"></i>
                         <p>Report Student Violation</p>
                     </a>
                 </li>
-
+               
                 <!-- Offenses & Sanction -->
-                <li class="nav-item">
-                    <a href="offenses_sanctions.php" class="nav-link">
-                        <i class="nav-icon fas fa-list"></i>
-                        <p>Offenses & Sanction</p>
+                <li class="nav-item has-treeview">
+                    <a href="#" class="nav-link">
+                        <i class="nav-icon fas fa-user-graduate"></i>
+                        <p>
+                            Offenses & Sanction
+                            <i class="fas fa-angle-left right"></i>
+                        </p>
                     </a>
+                    <ul class="nav nav-treeview">
+                        <li class="nav-item">
+                            <a href="manage_offenses.php" class="nav-link">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>Sec 1 - Academic</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="sec2.php" class="nav-link">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>Sec 2 - Non-Academic</p>
+                            </a>
+                        </li>
+                    </ul>
                 </li>
             </ul>
         </nav>
