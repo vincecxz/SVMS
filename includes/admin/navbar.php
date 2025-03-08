@@ -1,8 +1,6 @@
 <?php
-// Start session if not already started
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
+// Remove session_start since it's already handled in auth_check.php
+// which is included before this file
 ?>
 <!-- Navbar -->
 <nav class="main-header navbar navbar-expand navbar-dark ">

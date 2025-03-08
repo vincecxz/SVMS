@@ -200,6 +200,56 @@ include('../config/database.php');
         border-color: #4a5568 !important;
         color: #e2e8f0 !important;
     }
+
+    /* Progress bar styles */
+    .progress {
+        height: 25px;
+        border-radius: 12px;
+        background-color: #e9ecef;
+    }
+    
+    /* Select2 Dropdown Styling */
+    .select2-container--default .select2-selection--single {
+        height: 40px !important;
+        padding: 6px 12px !important;
+        border: 1px solid #ced4da !important;
+        border-radius: 4px !important;
+    }
+    
+    .select2-container--default .select2-selection--single .select2-selection__arrow {
+        height: 38px !important;
+    }
+    
+    .select2-container--default .select2-selection--single .select2-selection__rendered {
+        line-height: 28px !important;
+    }
+    
+    .select2-container--default .select2-results__option {
+        padding: 8px 12px !important;
+    }
+    
+    .select2-container--default .select2-search--dropdown .select2-search__field {
+        border: 1px solid #ced4da !important;
+        border-radius: 4px !important;
+        padding: 6px 12px !important;
+    }
+    
+    .select2-dropdown {
+        border: 1px solid #ced4da !important;
+        border-radius: 4px !important;
+    }
+    
+    /* Option items */
+    .select2-container--default .select2-results__option--highlighted[aria-selected] {
+        background-color: #E3F2FD !important;
+        color: #1976D2 !important;
+    }
+    
+    /* Add orange badge style */
+    .badge-orange {
+        background-color: #fd7e14 !important;
+        color: white !important;
+    }
 </style>
 </head>
 <body class="hold-transition sidebar-mini layout-fixed">
@@ -444,77 +494,89 @@ include('../config/database.php');
                     </div>
                     <div class="modal-body">
                         <form id="violationForm">
-                            <!-- Student Selection -->
-                            <div class="form-group">
-                                <label for="student">Select Student</label>
-                                <select class="form-control select2" id="student" name="student" required>
-                                    <!-- <option value="">Type student name...</option> -->
-                                    <?php
-                                    $query = "SELECT * FROM students ORDER BY full_name ASC";
-                                    $result = $conn->query($query);
-                                    while($row = $result->fetch_assoc()) {
-                                        echo "<option value='".$row['id']."'>".$row['full_name']."</option>";
-                                    }
-                                    ?>
-                                </select>
-                            </div>
+                            <div class="row">
+                                <!-- Left Column -->
+                                <div class="col-md-6">
+                                    <!-- Student Selection -->
+                                    <div class="form-group">
+                                        <label for="student">Select Student</label>
+                                        <select class="form-control select2" id="student" name="student" required>
+                                            <?php
+                                            $query = "SELECT * FROM students ORDER BY full_name ASC";
+                                            $result = $conn->query($query);
+                                            while($row = $result->fetch_assoc()) {
+                                                echo "<option value='".$row['id']."'>".$row['full_name']."</option>";
+                                            }
+                                            ?>
+                                        </select>
+                                    </div>
 
-                            <!-- Date and time -->
-                            <div class="form-group">
-                                <label for="incident_date">Incident Date</label>
-                                <div class="input-group" id="incident_datetime_picker" data-target-input="nearest">
-                                    <input type="text" class="form-control datetimepicker-input" data-target="#incident_datetime_picker" name="incident_datetime" required placeholder="MM/DD/YYYY HH:MM AM/PM"/>
-                                    <div class="input-group-append" data-target="#incident_datetime_picker" data-toggle="datetimepicker">
-                                        <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+                                    <!-- Section Selection -->
+                                    <div class="form-group">
+                                        <label for="section">Section</label>
+                                        <select class="form-control" id="section" name="section" required>
+                                            <option value="">Select Section</option>
+                                            <option value="section1">Section 1 - Academic</option>
+                                            <option value="section2">Section 2 - Non-Academic</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                
+                                <!-- Right Column -->
+                                <div class="col-md-6">
+                                    <!-- Date and time -->
+                                    <div class="form-group">
+                                        <label for="incident_date">Incident Date</label>
+                                        <div class="input-group" id="incident_datetime_picker" data-target-input="nearest">
+                                            <input type="text" class="form-control datetimepicker-input" data-target="#incident_datetime_picker" name="incident_datetime" required placeholder="MM/DD/YYYY HH:MM AM/PM"/>
+                                            <div class="input-group-append" data-target="#incident_datetime_picker" data-toggle="datetimepicker">
+                                                <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Offense Level -->
+                                    <div class="form-group">
+                                        <label for="offense_level">Offense Level</label>
+                                        <select class="form-control" id="offense_level" name="offense_level" disabled required>
+                                            <option value="">SELECT OFFENSE LEVEL</option>
+                                            <option value="Light">Light</option>
+                                            <option value="Serious">Serious</option>
+                                            <option value="Very Serious">Very Serious</option>
+                                        </select>
                                     </div>
                                 </div>
                             </div>
 
-                            <!-- Section Selection -->
-                            <div class="form-group">
-                                <label for="section">Section</label>
-                                <select class="form-control" id="section" name="section" required>
-                                    <option value="">Select Section</option>
-                                    <option value="section1">Section 1 - Academic</option>
-                                    <option value="section2">Section 2 - Non-Academic</option>
-                                </select>
-                            </div>
+                            <!-- Full Width Fields -->
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <!-- Offense Selection -->
+                                    <div class="form-group">
+                                        <label for="offense">Offense</label>
+                                        <select class="form-control select2" id="offense" name="offense" required style="width: 100%;">
+                                            <option value="">Select an offense</option>
+                                        </select>
+                                    </div>
 
-                            <!-- Offense Level -->
-                            <div class="form-group">
-                                <label for="offense_level">Offense Level</label>
-                                <select class="form-control" id="offense_level" name="offense_level" disabled required>
-                                    <option value="">SELECT OFFENSE LEVEL</option>
-                                    <option value="Light">Light</option>
-                                    <option value="Serious">Serious</option>
-                                    <option value="Very Serious">Very Serious</option>
-                                </select>
-                            </div>
+                                    <!-- Sanction Display -->
+                                    <div class="form-group">
+                                        <label>Corresponding Sanction</label>
+                                        <input type="text" class="form-control" id="sanction_display" readonly>
+                                    </div>
 
-                            <!-- Offense Selection -->
-                            <div class="form-group">
-                                <label for="offense">Offense</label>
-                                <select class="form-control" id="offense" name="offense" required>
-                                    <option value="">Select Offense</option>
-                                </select>
-                            </div>
-
-                            <!-- Sanction Display -->
-                            <div class="form-group">
-                                <label>Corresponding Sanction</label>
-                                <input type="text" class="form-control" id="sanction_display" readonly>
-                            </div>
-
-                            <!-- University Service Hours -->
-                            <div class="form-group mb-3" id="service_hours_container" style="display: none;">
-                                <label class="font-weight-bold">University Service Hours</label>
-                                <div class="input-group">
-                                    <input type="number" class="form-control" id="service_hours" name="service_hours" min="1">
-                                    <div class="input-group-append">
-                                        <span class="input-group-text">hours</span>
+                                    <!-- University Service Hours -->
+                                    <div class="form-group mb-3" id="service_hours_container" style="display: none;">
+                                        <label class="font-weight-bold">University Service Hours</label>
+                                        <div class="input-group">
+                                            <input type="number" class="form-control" id="service_hours" name="service_hours" min="1">
+                                            <div class="input-group-append">
+                                                <span class="input-group-text">hours</span>
+                                            </div>
+                                        </div>
+                                        <small class="form-text text-muted">Enter the number of university service hours required.</small>
                                     </div>
                                 </div>
-                                <small class="form-text text-muted">Enter the number of university service hours required.</small>
                             </div>
                             <div class="modal-footer">
                             <!-- Submit Button -->
@@ -1239,6 +1301,14 @@ include('../config/database.php');
             dropdownParent: $('#addReportModal')
         });
 
+        // Initialize offense dropdown with Select2
+        $('#offense').select2({
+            placeholder: 'Select an offense',
+            allowClear: true,
+            width: '100%',
+            dropdownParent: $('#addReportModal')
+        });
+
         // Initialize DateTime Picker with custom options
         $('#incident_datetime_picker').datetimepicker({
             format: 'MM/DD/YYYY hh:mm A',
@@ -1300,6 +1370,8 @@ include('../config/database.php');
                                     `<option value="${offense.id}">${offense.description}</option>`
                                 );
                             });
+                            // Reinitialize Select2 for offense dropdown
+                            offenseSelect.trigger('change');
                         }
                     }
                 });
@@ -1339,6 +1411,8 @@ include('../config/database.php');
                                     `<option value="${offense.id}">${offense.description}</option>`
                                 );
                             });
+                            // Reinitialize Select2 for offense dropdown
+                            offenseSelect.trigger('change');
                         }
                     }
                 });
@@ -1500,6 +1574,24 @@ include('../config/database.php');
             $('#sanction_display').val('');
         });
 
+        // Reinitialize Select2 when the modal is shown
+        $('#addReportModal').on('shown.bs.modal', function() {
+            $('#student').select2({
+                placeholder: 'Select Student',
+                allowClear: true,
+                width: '100%',
+                minimumInputLength: 1,
+                dropdownParent: $('#addReportModal')
+            });
+            
+            $('#offense').select2({
+                placeholder: 'Select an offense',
+                allowClear: true,
+                width: '100%',
+                dropdownParent: $('#addReportModal')
+            });
+        });
+
         // Initialize service date picker
         $('#service_datetime_picker').datetimepicker({
             format: 'MM/DD/YYYY hh:mm A',
@@ -1637,6 +1729,8 @@ include('../config/database.php');
                                     `<option value="${offense.id}" ${offense.id == selectedOffenseId ? 'selected' : ''}>${offense.description}</option>`
                                 );
                             });
+                            // Reinitialize Select2 for offense dropdown
+                            offenseSelect.trigger('change');
                         }
                     }
                 });
@@ -1650,15 +1744,15 @@ include('../config/database.php');
                         level: level
                     },
                     success: function(response) {
+                        offenseSelect.empty().append('<option value="">Select Offense</option>');
                         if (response.success) {
-                            // Clear existing options first
-                            offenseSelect.empty().append('<option value="">Select Offense</option>');
-                            // Add new options
                             response.data.forEach(function(offense) {
                                 offenseSelect.append(
-                                    `<option value="${offense.id}" ${offense.id == selectedOffenseId ? 'selected' : ''}>${offense.description}</option>`
+                                    `<option value="${offense.id}">${offense.description}</option>`
                                 );
                             });
+                            // Reinitialize Select2 for offense dropdown
+                            offenseSelect.trigger('change');
                         }
                     }
                 });
@@ -1852,6 +1946,43 @@ include('../config/database.php');
         height: 25px;
         border-radius: 12px;
         background-color: #e9ecef;
+    }
+    
+    /* Select2 Dropdown Styling */
+    .select2-container--default .select2-selection--single {
+        height: 40px !important;
+        padding: 6px 12px !important;
+        border: 1px solid #ced4da !important;
+        border-radius: 4px !important;
+    }
+    
+    .select2-container--default .select2-selection--single .select2-selection__arrow {
+        height: 38px !important;
+    }
+    
+    .select2-container--default .select2-selection--single .select2-selection__rendered {
+        line-height: 28px !important;
+    }
+    
+    .select2-container--default .select2-results__option {
+        padding: 8px 12px !important;
+    }
+    
+    .select2-container--default .select2-search--dropdown .select2-search__field {
+        border: 1px solid #ced4da !important;
+        border-radius: 4px !important;
+        padding: 6px 12px !important;
+    }
+    
+    .select2-dropdown {
+        border: 1px solid #ced4da !important;
+        border-radius: 4px !important;
+    }
+    
+    /* Option items */
+    .select2-container--default .select2-results__option--highlighted[aria-selected] {
+        background-color: #E3F2FD !important;
+        color: #1976D2 !important;
     }
     
     /* Add orange badge style */
