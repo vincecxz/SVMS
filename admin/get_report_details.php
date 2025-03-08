@@ -40,6 +40,7 @@ if ($result && $result->num_rows > 0) {
     $incident_date = date('F d, Y h:i A', strtotime($report['incident_datetime']));
     $created_date = date('F d, Y h:i A', strtotime($report['created_at']));
     $updated_date = date('F d, Y h:i A', strtotime($report['updated_at']));
+    $resolution_date = $report['resolution_datetime'] ? date('F d, Y h:i A', strtotime($report['resolution_datetime'])) : 'Not resolved yet';
     
     // Get violation history if count > 1
     $violation_history = '';
@@ -86,8 +87,8 @@ if ($result && $result->num_rows > 0) {
                         <td>' . htmlspecialchars($history['offense_description']) . '</td>
                         <td>' . htmlspecialchars($history['sanction']) . '</td>
                         <td class="text-center">
-                            <span class="badge badge-' . ($history['status'] == 'Active' ? 'danger' : 'success') . ' badge-pill">
-                                ' . ($history['status'] == 'Active' ? '● Active' : '● Resolved') . '
+                            <span class="badge badge-' . ($history['status'] == 'Active' ? 'danger' : ($history['status'] == 'Resolved' ? 'success' : 'orange')) . ' badge-pill">
+                                ' . ($history['status'] == 'Active' ? '● Active' : ($history['status'] == 'Resolved' ? '● Resolved' : '● In progress')) . '
                             </span>
                         </td>
                     </tr>';
@@ -185,6 +186,12 @@ if ($result && $result->num_rows > 0) {
                                 . ($report['status'] == 'Active' ? '● Active' : '● Resolved') . '</span>
                             </div>
                         </div>
+                        ' . ($report['status'] == 'Resolved' ? '
+                        <hr class="my-2">
+                        <div class="row">
+                            <div class="col-md-4 font-weight-bold">Resolution Date & Time</div>
+                            <div class="col-md-8">' . $resolution_date . '</div>
+                        </div>' : '') . '
                     </div>
                 </div>
 

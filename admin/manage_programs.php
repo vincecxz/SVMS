@@ -28,6 +28,7 @@ $result = mysqli_query($conn, $query);
     <link rel="stylesheet" href="../dist/css/adminlte.min.css">
     <!-- SweetAlert2 -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    
 </head>
 <body class="hold-transition sidebar-mini layout-fixed">
     <div class="wrapper">
@@ -53,6 +54,12 @@ $result = mysqli_query($conn, $query);
                 </div>
             </section>
 
+              <!-- Floating Add Button -->
+              <button type="button" class="btn-float"  data-toggle="modal" data-target="#addProgramModal">
+                <i class="fas fa-plus fa-lg"></i>
+                <span class="btn-float-label">Add Program</span>
+            </button>
+
             <!-- Main content -->
             <section class="content">
                 <div class="container-fluid">
@@ -62,9 +69,9 @@ $result = mysqli_query($conn, $query);
                                 <div class="card-header">
                                     <div class="d-flex justify-content-between align-items-center">
                                         <h3 class="card-title">Programs List</h3>
-                                        <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#addProgramModal">
+                                        <!-- <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#addProgramModal">
                                             <i class="fas fa-plus"></i> Add Program
-                                        </button>
+                                        </button> -->
                                     </div>
                                 </div>
                                 <div class="card-body">
@@ -85,9 +92,7 @@ $result = mysqli_query($conn, $query);
                                                             <button type="button" class="btn btn-warning btn-sm" onclick="editProgram('<?php echo $row['id']; ?>')" title="Edit Program">
                                                                 <i class="fas fa-edit"></i>
                                                             </button>
-                                                            <button type="button" class="btn btn-info btn-sm" onclick="manageSections('<?php echo $row['id']; ?>')" title="Manage Sections">
-                                                                <i class="fas fa-list"></i>
-                                                            </button>
+                                                           
                                                             <button type="button" class="btn btn-danger btn-sm" onclick="deleteProgram('<?php echo $row['id']; ?>')" title="Delete Program">
                                                                 <i class="fas fa-trash"></i>
                                                             </button>
@@ -107,13 +112,14 @@ $result = mysqli_query($conn, $query);
                 </div>
             </section>
         </div>
+        <?php include '../includes/admin/footer.php'; ?>
     </div>
 
     <!-- Add Program Modal -->
-    <div class="modal fade" id="addProgramModal">
+    <div class="modal fade" id="addProgramModal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="staticBackdropLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
-                <div class="modal-header">
+                <div class="modal-header bg-primary">
                     <h4 class="modal-title">Add Program</h4>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
@@ -136,7 +142,7 @@ $result = mysqli_query($conn, $query);
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                        <!-- <button type="button" class="btn btn-default" data-dismiss="modal">Close</button> -->
                         <button type="submit" class="btn btn-primary">Add Program</button>
                     </div>
                 </form>
@@ -145,10 +151,10 @@ $result = mysqli_query($conn, $query);
     </div>
 
     <!-- Edit Program Modal -->
-    <div class="modal fade" id="editProgramModal">
+    <div class="modal fade" id="editProgramModal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="staticBackdropLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
-                <div class="modal-header">
+                <div class="modal-header bg-warning">
                     <h4 class="modal-title">Edit Program</h4>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
@@ -165,10 +171,19 @@ $result = mysqli_query($conn, $query);
                             <label for="edit_program_name">Program Name <span class="text-danger">*</span></label>
                             <input type="text" class="form-control" id="edit_program_name" name="program_name" required>
                         </div>
+                        <div class="form-group">
+                            <label for="edit_program_sections">Sections <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="edit_program_sections" name="sections" 
+                                   placeholder="e.g., 1A, 1B, 2A" required>
+                            <small class="form-text text-muted">Enter sections separated by commas (e.g., 1A, 1B, 2A)</small>
+                            <div id="current_sections" class="mt-2">
+                                <small class="text-red">Current sections: <span id="current_sections_list"></span></small>
+                            </div>
+                        </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                        <button type="submit" class="btn btn-primary">Save Changes</button>
+                        <!-- <button type="button" class="btn btn-default" data-dismiss="modal">Close</button> -->
+                        <button type="submit" class="btn btn-warning">Save Changes</button>
                     </div>
                 </form>
             </div>
@@ -205,6 +220,7 @@ $result = mysqli_query($conn, $query);
                 </form>
             </div>
         </div>
+       
     </div>
 
     <!-- jQuery -->
@@ -278,6 +294,18 @@ $result = mysqli_query($conn, $query);
             $('#editProgramForm').on('submit', function(e) {
                 e.preventDefault();
                 
+                // Basic validation for sections
+                const sections = $('#edit_program_sections').val().trim();
+                if (!sections) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Please enter at least one section'
+                    });
+                    return;
+                }
+
+                // Submit the form if validation passes
                 $.ajax({
                     type: 'POST',
                     url: 'program_actions.php',
@@ -360,6 +388,18 @@ $result = mysqli_query($conn, $query);
                     $('#edit_program_id').val(response.data.id);
                     $('#edit_program_code').val(response.data.code);
                     $('#edit_program_name').val(response.data.name);
+                    
+                    // Handle sections
+                    if (response.data.sections) {
+                        const sections = response.data.sections;
+                        $('#edit_program_sections').val(sections);
+                        $('#current_sections_list').text(sections);
+                        $('#current_sections').show();
+                    } else {
+                        $('#edit_program_sections').val('');
+                        $('#current_sections').hide();
+                    }
+                    
                     $('#editProgramModal').modal('show');
                 } else {
                     Swal.fire({
@@ -428,5 +468,88 @@ $result = mysqli_query($conn, $query);
             });
         }
     </script>
+
+<style>
+         
+         /* Floating Action Button */
+  .btn-float {
+      position: fixed !important;
+      bottom: 30px !important;
+      right: 30px !important;
+      width: 60px !important;
+      height: 60px !important;
+      background-color: #00b0ff !important;
+      border: none !important;
+      border-radius: 50% !important;
+      color: white !important;
+      font-size: 24px !important;
+      cursor: pointer !important;
+      box-shadow: 0 4px 10px rgba(0, 176, 255, 0.3) !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      transition: all 0.3s ease !important;
+      z-index: 1050 !important;
+      outline: none !important;
+  }
+
+  .btn-float:hover {
+      transform: scale(1.1) !important;
+      box-shadow: 0 6px 15px rgba(0, 176, 255, 0.4) !important;
+  }
+
+  .btn-float:active {
+      transform: scale(0.95) !important;
+  }
+
+  .btn-float i {
+      transition: all 0.3s ease !important;
+  }
+
+  .btn-float-label {
+      position: absolute !important;
+      right: 70px !important;
+      background-color: rgba(0, 0, 0, 0.8) !important;
+      color: white !important;
+      padding: 8px 12px !important;
+      border-radius: 4px !important;
+      font-size: 14px !important;
+      font-weight: 500 !important;
+      opacity: 0 !important;
+      visibility: hidden !important;
+      transition: all 0.3s ease !important;
+      white-space: nowrap !important;
+  }
+
+  .btn-float:hover .btn-float-label {
+      opacity: 1 !important;
+      visibility: visible !important;
+      right: 75px !important;
+  }
+
+  .btn-float-label:after {
+      content: '' !important;
+      position: absolute !important;
+      right: -5px !important;
+      top: 50% !important;
+      transform: translateY(-50%) !important;
+      width: 0 !important;
+      height: 0 !important;
+      border-top: 5px solid transparent !important;
+      border-bottom: 5px solid transparent !important;
+      border-left: 5px solid rgba(0, 0, 0, 0.8) !important;
+  }
+
+  @media (max-width: 768px) {
+      .btn-float {
+          width: 50px !important;
+          height: 50px !important;
+          bottom: 20px !important;
+          right: 20px !important;
+          font-size: 20px !important;
+      }
+  }
+  
+  </style>
 </body>
 </html> 

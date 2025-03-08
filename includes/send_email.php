@@ -11,7 +11,7 @@ function sendViolationEmail($studentId, $violationDetails) {
     
     try {
         // Get student email
-        $query = "SELECT full_name, email FROM students WHERE id = ?";
+        $query = "SELECT full_name, email, password FROM students WHERE id = ?";
         $stmt = $conn->prepare($query);
         
         if (!$stmt) {
@@ -33,6 +33,23 @@ function sendViolationEmail($studentId, $violationDetails) {
         
         if (empty($student['email'])) {
             throw new Exception("Student email not found for ID: " . $studentId);
+        }
+
+        // Only generate password if student doesn't have one
+        $plainPassword = null;
+        if (empty($student['password'])) {
+            // Generate a random 8 character password
+            $plainPassword = substr(str_shuffle('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'), 0, 8);
+            
+            // Update student password in database
+            $updateQuery = "UPDATE students SET password = ? WHERE id = ?";
+            $updateStmt = $conn->prepare($updateQuery);
+            $hashedPassword = password_hash($plainPassword, PASSWORD_DEFAULT);
+            $updateStmt->bind_param("si", $hashedPassword, $studentId);
+            
+            if (!$updateStmt->execute()) {
+                throw new Exception("Failed to update password: " . $updateStmt->error);
+            }
         }
 
         // Create a new PHPMailer instance
@@ -76,8 +93,20 @@ function sendViolationEmail($studentId, $violationDetails) {
                 </div>
                 
                 <div style='padding: 20px; background-color: #f9f9f9;'>
-                    <p>Dear <strong>{$student['full_name']}</strong>,</p>
-                    
+                    <p>Dear <strong>{$student['full_name']}</strong>,</p>";
+
+            // Only include credentials if password was just generated
+            if ($plainPassword !== null) {
+                $body .= "
+                    <div style='background-color: #fff3cd; padding: 15px; border-left: 4px solid #ffeeba; margin: 20px 0;'>
+                        <h3 style='margin-top: 0; color: #856404;'>Your System Access Credentials</h3>
+                        <p><strong>Email (Username):</strong> {$student['email']}</p>
+                        <p><strong>Password:</strong> {$plainPassword}</p>
+                        <p style='color: #856404;'><em>Please change your password upon first login for security purposes.</em></p>
+                    </div>";
+            }
+
+            $body .= "
                     <p>This email is to inform you that a violation report has been filed with the following details:</p>
                     
                     <div style='background-color: white; padding: 15px; border-left: 4px solid #003366; margin: 20px 0;'>

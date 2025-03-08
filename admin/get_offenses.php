@@ -14,7 +14,7 @@ $section = $_POST['section'];
 
 if ($section === 'section1') {
     // Fetch Section 1 (Academic) offenses
-    $query = "SELECT * FROM sec1 ORDER BY id";
+    $query = "SELECT DISTINCT id, description FROM sec1 ORDER BY id";
     $result = $conn->query($query);
     
     if ($result) {
@@ -37,7 +37,7 @@ if ($section === 'section1') {
     }
 
     $level = mysqli_real_escape_string($conn, $_POST['level']);
-    $query = "SELECT * FROM sec2 WHERE category = '$level' ORDER BY id";
+    $query = "SELECT DISTINCT id, description FROM sec2 WHERE category = '$level' ORDER BY id";
     $result = $conn->query($query);
     
     if ($result) {

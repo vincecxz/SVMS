@@ -47,19 +47,15 @@ switch ($action) {
 
         $id = mysqli_real_escape_string($conn, $_POST['offense_id']);
         $description = mysqli_real_escape_string($conn, $_POST['description']);
-
         $first_sanction = mysqli_real_escape_string($conn, $_POST['first_sanction']);
         $second_sanction = mysqli_real_escape_string($conn, $_POST['second_sanction']);
         $third_sanction = mysqli_real_escape_string($conn, $_POST['third_sanction']);
 
-
         $query = "UPDATE sec1 SET 
                  description = '$description',
-            
                  first_sanction = '$first_sanction',
                  second_sanction = '$second_sanction',
-                 third_sanction = '$third_sanction',
-          
+                 third_sanction = '$third_sanction'
                  WHERE id = '$id'";
 
         if ($conn->query($query)) {

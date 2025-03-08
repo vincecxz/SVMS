@@ -20,6 +20,7 @@ include('../config/database.php');
     <link rel="stylesheet" href="../dist/css/adminlte.min.css">
     <!-- SweetAlert2 -->
     <link rel="stylesheet" href="../plugins/sweetalert2-theme-bootstrap-4/bootstrap-4.min.css">
+    
 </head>
 <body class="hold-transition sidebar-mini layout-fixed">
     <div class="wrapper">
@@ -109,7 +110,7 @@ include('../config/database.php');
                                     <table id="lightOffensesTable" class="table table-bordered table-striped">
                                         <thead>
                                             <tr>
-                                                <th>ID</th>
+                                                <!-- <th>ID</th> -->
                                                 <th>Offense Description</th>
                                                 <th>1st Sanction</th>
                                                 <th>2nd Sanction</th>
@@ -124,13 +125,13 @@ include('../config/database.php');
                                             
                                             while($row = $result->fetch_assoc()) {
                                                 echo "<tr>";
-                                                echo "<td>".$row['id']."</td>";
+                                                // echo "<td>".$row['id']."</td>";
                                                 echo "<td>".$row['description']."</td>";
                                                 echo "<td>".$row['first_sanction']."</td>";
                                                 echo "<td>".$row['second_sanction']."</td>";
                                                 echo "<td>".$row['third_sanction']."</td>";
                                                 echo "<td>
-                                                    <button class='btn btn-sm btn-primary edit-offense' data-id='".$row['id']."'><i class='fas fa-edit'></i></button>
+                                                    <button class='btn btn-sm btn-warning edit-offense' data-id='".$row['id']."'><i class='fas fa-edit'></i></button>
                                                     <button class='btn btn-sm btn-danger delete-offense' data-id='".$row['id']."'><i class='fas fa-trash'></i></button>
                                                 </td>";
                                                 echo "</tr>";
@@ -179,7 +180,7 @@ include('../config/database.php');
                                     <table id="seriousOffensesTable" class="table table-bordered table-striped">
                                         <thead>
                                             <tr>
-                                                <th>ID</th>
+                                                <!-- <th>ID</th> -->
                                                 <th>Offense Description</th>
                                                 <th>1st Sanction</th>
                                                 <th>2nd Sanction</th>
@@ -194,13 +195,13 @@ include('../config/database.php');
                                             
                                             while($row = $result->fetch_assoc()) {
                                                 echo "<tr>";
-                                                echo "<td>".$row['id']."</td>";
+                                                // echo "<td>".$row['id']."</td>";
                                                 echo "<td>".$row['description']."</td>";
                                                 echo "<td>".$row['first_sanction']."</td>";
                                                 echo "<td>".$row['second_sanction']."</td>";
                                                 echo "<td>".$row['third_sanction']."</td>";
                                                 echo "<td>
-                                                    <button class='btn btn-sm btn-primary edit-offense' data-id='".$row['id']."'><i class='fas fa-edit'></i></button>
+                                                    <button class='btn btn-sm btn-warning edit-offense' data-id='".$row['id']."'><i class='fas fa-edit'></i></button>
                                                     <button class='btn btn-sm btn-danger delete-offense' data-id='".$row['id']."'><i class='fas fa-trash'></i></button>
                                                 </td>";
                                                 echo "</tr>";
@@ -249,7 +250,7 @@ include('../config/database.php');
                                     <table id="verySeriousOffensesTable" class="table table-bordered table-striped">
                                         <thead>
                                             <tr>
-                                                <th>ID</th>
+                                                <!-- <th>ID</th> -->
                                                 <th>Offense Description</th>
                                                 <th>1st Sanction</th>
                                                 <th>2nd Sanction</th>
@@ -264,13 +265,13 @@ include('../config/database.php');
                                             
                                             while($row = $result->fetch_assoc()) {
                                                 echo "<tr>";
-                                                echo "<td>".$row['id']."</td>";
+                                                // echo "<td>".$row['id']."</td>";
                                                 echo "<td>".$row['description']."</td>";
                                                 echo "<td>".$row['first_sanction']."</td>";
                                                 echo "<td>".$row['second_sanction']."</td>";
                                                 echo "<td>".$row['third_sanction']."</td>";
                                                 echo "<td>
-                                                    <button class='btn btn-sm btn-primary edit-offense' data-id='".$row['id']."'><i class='fas fa-edit'></i></button>
+                                                    <button class='btn btn-sm btn-warning edit-offense' data-id='".$row['id']."'><i class='fas fa-edit'></i></button>
                                                     <button class='btn btn-sm btn-danger delete-offense' data-id='".$row['id']."'><i class='fas fa-trash'></i></button>
                                                 </td>";
                                                 echo "</tr>";
@@ -289,10 +290,10 @@ include('../config/database.php');
     
 
         <!-- Add Offense Modal -->
-        <div class="modal fade" id="addOffenseModal" tabindex="-1">
+        <div class="modal fade" id="addOffenseModal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="staticBackdropLabel" aria-hidden="true">
             <div class="modal-dialog modal-lg">
                 <div class="modal-content">
-                    <div class="modal-header">
+                    <div class="modal-header bg-primary">
                         <h5 class="modal-title">Add New Offense</h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
@@ -315,20 +316,20 @@ include('../config/database.php');
                             </div>
                             <div class="form-group">
                                 <label>1st Sanction</label>
-                                <input type="text" class="form-control" name="first_sanction" required>
+                                <input type="text" class="form-control" name="first_sanction" >
                             </div>
                             <div class="form-group">
                                 <label>2nd Sanction</label>
-                                <input type="text" class="form-control" name="second_sanction" required>
+                                <input type="text" class="form-control" name="second_sanction" >
                             </div>
                             <div class="form-group">
                                 <label>3rd Sanction</label>
-                                <input type="text" class="form-control" name="third_sanction" required>
+                                <input type="text" class="form-control" name="third_sanction" >
                             </div>
                         </form>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <!-- <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button> -->
                         <button type="button" class="btn btn-primary" id="saveOffense">Save Offense</button>
                     </div>
                 </div>
@@ -336,10 +337,10 @@ include('../config/database.php');
         </div>
 
         <!-- Edit Offense Modal -->
-        <div class="modal fade" id="editOffenseModal" tabindex="-1">
+        <div class="modal fade" id="editOffenseModal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="staticBackdropLabel" aria-hidden="true">
             <div class="modal-dialog modal-lg">
                 <div class="modal-content">
-                    <div class="modal-header">
+                    <div class="modal-header bg-warning">
                         <h5 class="modal-title">Edit Offense</h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
@@ -353,7 +354,7 @@ include('../config/database.php');
                                 <textarea class="form-control" name="description" id="edit_description" required rows="3"></textarea>
                             </div>
                             <div class="form-group">
-                                <label>Category</label>
+                                <label>Category </label>
                                 <select class="form-control" name="category" id="edit_category" required>
                                     <option value="Light">Light</option>
                                     <option value="Serious">Serious</option>
@@ -375,8 +376,8 @@ include('../config/database.php');
                         </form>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                        <button type="button" class="btn btn-primary" id="updateOffense">Update Offense</button>
+                        <!-- <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button> -->
+                        <button type="button" class="btn btn-warning" id="updateOffense">Save Changes</button>
                     </div>
                 </div>
             </div>
@@ -397,6 +398,8 @@ include('../config/database.php');
     <script src="../dist/js/adminlte.min.js"></script>
     <!-- SweetAlert2 -->
     <script src="../plugins/sweetalert2/sweetalert2.min.js"></script>
+     <!-- SweetAlert2 -->
+     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script>
         $(document).ready(function() {
@@ -471,7 +474,7 @@ include('../config/database.php');
                 var secondSanction = $('#addOffenseForm input[name="second_sanction"]').val();
                 var thirdSanction = $('#addOffenseForm input[name="third_sanction"]').val();
 
-                if (!category || !description || !firstSanction || !secondSanction || !thirdSanction) {
+                if (!category || !description ) {
                     Swal.fire({
                         icon: 'error',
                         title: 'Validation Error',

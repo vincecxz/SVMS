@@ -20,6 +20,8 @@ include('../config/database.php');
     <link rel="stylesheet" href="../dist/css/adminlte.min.css">
     <!-- SweetAlert2 -->
     <link rel="stylesheet" href="../plugins/sweetalert2-theme-bootstrap-4/bootstrap-4.min.css">
+    <!-- SweetAlert2 -->
+    <link rel="stylesheet" href="../plugins/sweetalert2-theme-bootstrap-4/bootstrap-4.min.css">
 </head>
 <body class="hold-transition sidebar-mini layout-fixed">
     <div class="wrapper">
@@ -87,7 +89,7 @@ include('../config/database.php');
                                                 echo "<td>".$row['second_sanction']."</td>";
                                                 echo "<td>".$row['third_sanction']."</td>";
                                                 echo "<td>
-                                                    <button class='btn btn-sm btn-primary edit-offense' data-id='".$row['id']."'><i class='fas fa-edit'></i></button>
+                                                    <button class='btn btn-sm btn-warning edit-offense' data-id='".$row['id']."'><i class='fas fa-edit'></i></button>
                                                     <button class='btn btn-sm btn-danger delete-offense' data-id='".$row['id']."'><i class='fas fa-trash'></i></button>
                                                 </td>";
                                                 echo "</tr>";
@@ -104,7 +106,7 @@ include('../config/database.php');
         </div>
 
         <!-- Add Offense Modal -->
-        <div class="modal fade" id="addOffenseModal" tabindex="-1">
+        <div class="modal fade" id="addOffenseModal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="staticBackdropLabel" aria-hidden="true">
             <div class="modal-dialog modal-lg">
                 <div class="modal-content">
                     <div class="modal-header">
@@ -135,7 +137,7 @@ include('../config/database.php');
                         </form>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <!-- <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button> -->
                         <button type="button" class="btn btn-primary" id="saveOffense">Save Offense</button>
                     </div>
                 </div>
@@ -143,10 +145,10 @@ include('../config/database.php');
         </div>
 
         <!-- Edit Offense Modal -->
-        <div class="modal fade" id="editOffenseModal" tabindex="-1">
+        <div class="modal fade" id="editOffenseModal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="staticBackdropLabel" aria-hidden="true">
             <div class="modal-dialog modal-lg">
                 <div class="modal-content">
-                    <div class="modal-header">
+                    <div class="modal-header bg-warning">
                         <h5 class="modal-title">Edit Offense</h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
@@ -175,8 +177,8 @@ include('../config/database.php');
                         </form>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                        <button type="button" class="btn btn-primary" id="updateOffense">Update Offense</button>
+                        <!-- <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button> -->
+                        <button type="button" class="btn btn-warning" id="updateOffense">Save Changes</button>
                     </div>
                 </div>
             </div>
@@ -197,6 +199,8 @@ include('../config/database.php');
     <script src="../dist/js/adminlte.min.js"></script>
     <!-- SweetAlert2 -->
     <script src="../plugins/sweetalert2/sweetalert2.min.js"></script>
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script>
         $(document).ready(function() {
@@ -256,10 +260,25 @@ include('../config/database.php');
 
             // Update offense
             $('#updateOffense').click(function() {
+                const formData = $('#editOffenseForm').serialize() + '&action=update';
+                
+                // Show loading state
+                Swal.fire({
+                    title: 'Updating...',
+                    text: 'Please wait while we update the offense',
+                    allowOutsideClick: false,
+                    allowEscapeKey: false,
+                    showConfirmButton: false,
+                    didOpen: () => {
+                        Swal.showLoading();
+                    }
+                });
+
                 $.ajax({
                     url: 'offense_actions.php',
                     method: 'POST',
-                    data: $('#editOffenseForm').serialize() + '&action=update',
+                    data: formData,
+                    dataType: 'json',
                     success: function(response) {
                         if(response.success) {
                             Swal.fire({
@@ -276,6 +295,16 @@ include('../config/database.php');
                                 text: response.message || 'Failed to update offense'
                             });
                         }
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('Update error:', error);
+                        console.error('Server response:', xhr.responseText);
+                        
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: 'An error occurred while updating the offense. Please try again.'
+                        });
                     }
                 });
             });

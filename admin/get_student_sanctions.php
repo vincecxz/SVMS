@@ -37,9 +37,6 @@ try {
     
     if (mysqli_num_rows($result) > 0) {
         echo '<div class="card">
-                <div class="card-header bg-danger">
-                    <h3 class="card-title text-white">Active Sanctions</h3>
-                </div>
                 <div class="card-body">
                     <div class="table-responsive">
                         <table class="table table-bordered table-striped">

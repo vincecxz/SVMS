@@ -75,28 +75,60 @@ switch ($action) {
         $program_id = mysqli_real_escape_string($conn, $_POST['program_id']);
         $program_code = mysqli_real_escape_string($conn, trim($_POST['program_code']));
         $program_name = mysqli_real_escape_string($conn, trim($_POST['program_name']));
+        $sections = isset($_POST['sections']) ? $_POST['sections'] : '';
 
-        // Check if program code already exists for other programs
-        $check_query = "SELECT id FROM programs WHERE code = ? AND id != ?";
-        $stmt = mysqli_prepare($conn, $check_query);
-        mysqli_stmt_bind_param($stmt, "si", $program_code, $program_id);
-        mysqli_stmt_execute($stmt);
-        $result = mysqli_stmt_get_result($stmt);
+        // Start transaction
+        mysqli_begin_transaction($conn);
 
-        if (mysqli_num_rows($result) > 0) {
-            echo json_encode(['success' => false, 'message' => 'Program code already exists']);
-            exit;
-        }
+        try {
+            // Update program details
+            $query = "UPDATE programs SET code = ?, name = ? WHERE id = ?";
+            $stmt = mysqli_prepare($conn, $query);
+            mysqli_stmt_bind_param($stmt, "ssi", $program_code, $program_name, $program_id);
+            
+            if (!mysqli_stmt_execute($stmt)) {
+                throw new Exception("Failed to update program");
+            }
 
-        // Update program
-        $update_query = "UPDATE programs SET code = ?, name = ? WHERE id = ?";
-        $stmt = mysqli_prepare($conn, $update_query);
-        mysqli_stmt_bind_param($stmt, "ssi", $program_code, $program_name, $program_id);
+            // Delete existing sections
+            $query = "DELETE FROM sections WHERE program_id = ?";
+            $stmt = mysqli_prepare($conn, $query);
+            mysqli_stmt_bind_param($stmt, "i", $program_id);
+            
+            if (!mysqli_stmt_execute($stmt)) {
+                throw new Exception("Failed to remove existing sections");
+            }
 
-        if (mysqli_stmt_execute($stmt)) {
-            echo json_encode(['success' => true, 'message' => 'Program updated successfully']);
-        } else {
-            echo json_encode(['success' => false, 'message' => 'Failed to update program']);
+            // Insert new sections if provided
+            if (!empty($sections)) {
+                $sections_array = array_map('trim', explode(',', $sections));
+                $insert_query = "INSERT INTO sections (program_id, section) VALUES (?, ?)";
+                $stmt = mysqli_prepare($conn, $insert_query);
+                
+                foreach ($sections_array as $section) {
+                    if (!empty($section)) {
+                        mysqli_stmt_bind_param($stmt, "is", $program_id, $section);
+                        if (!mysqli_stmt_execute($stmt)) {
+                            throw new Exception("Failed to add section: $section");
+                        }
+                    }
+                }
+            }
+
+            // Commit transaction
+            mysqli_commit($conn);
+            
+            echo json_encode([
+                'success' => true,
+                'message' => 'Program and sections updated successfully'
+            ]);
+            
+        } catch (Exception $e) {
+            mysqli_rollback($conn);
+            echo json_encode([
+                'success' => false,
+                'message' => $e->getMessage()
+            ]);
         }
         break;
 
@@ -152,16 +184,37 @@ switch ($action) {
         }
 
         $program_id = mysqli_real_escape_string($conn, $_GET['program_id']);
-        $query = "SELECT * FROM programs WHERE id = ?";
+        
+        // Get program details including sections
+        $query = "SELECT p.*, GROUP_CONCAT(s.section ORDER BY s.section) as sections 
+                  FROM programs p 
+                  LEFT JOIN sections s ON p.id = s.program_id 
+                  WHERE p.id = ?
+                  GROUP BY p.id";
+        
         $stmt = mysqli_prepare($conn, $query);
         mysqli_stmt_bind_param($stmt, "i", $program_id);
-        mysqli_stmt_execute($stmt);
-        $result = mysqli_stmt_get_result($stmt);
-
-        if ($row = mysqli_fetch_assoc($result)) {
-            echo json_encode(['success' => true, 'data' => $row]);
+        
+        if (mysqli_stmt_execute($stmt)) {
+            $result = mysqli_stmt_get_result($stmt);
+            $program = mysqli_fetch_assoc($result);
+            
+            if ($program) {
+                echo json_encode([
+                    'success' => true,
+                    'data' => $program
+                ]);
+            } else {
+                echo json_encode([
+                    'success' => false,
+                    'message' => 'Program not found'
+                ]);
+            }
         } else {
-            echo json_encode(['success' => false, 'message' => 'Program not found']);
+            echo json_encode([
+                'success' => false,
+                'message' => 'Failed to fetch program details'
+            ]);
         }
         break;
 

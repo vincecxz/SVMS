@@ -271,9 +271,21 @@ try {
 
         // Validate contact number only if provided (now optional)
         if (!empty($contact_number)) {
+            // Format contact number - handle Excel's removal of leading zero
+            $contact_number = preg_replace('/[^0-9]/', '', $contact_number); // Remove any non-numeric characters
+            
+            // If number starts with 9 and is 10 digits, add the leading 0
+            if (preg_match('/^9\d{9}$/', $contact_number)) {
+                $contact_number = '0' . $contact_number;
+            }
+            
+            // Now validate the formatted number
             if (!preg_match('/^09\d{9}$/', $contact_number)) {
                 $errors[] = "Row $row_num: Invalid contact number format for '$contact_number'. Must be in format 09XXXXXXXXX";
                 $validation_error = true;
+            } else {
+                // Update the record with the formatted contact number
+                $record['contact_number'] = $contact_number;
             }
         } else {
             // Set contact_number to NULL if empty

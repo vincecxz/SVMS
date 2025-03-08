@@ -35,171 +35,6 @@ include('../config/database.php');
     .bg-warning {
         background-color: rgb(255, 191, 0) !important;
     }
-
-    /* Clean Select2 Dropdown Styling */
-    .select2-container--bootstrap4 {
-        width: 100% !important;
-    }
-
-    /* Input field styling */
-    .select2-container--bootstrap4 .select2-selection {
-        height: auto !important;
-        min-height: 45px !important;
-        background-color: #fff !important;
-        border: 1px solid #ced4da !important;
-        border-radius: 4px !important;
-        transition: border-color 0.15s ease-in-out !important;
-    }
-
-    /* Dropdown styling */
-    .select2-container--bootstrap4 .select2-dropdown {
-        border: none !important;
-        box-shadow: 0 4px 16px rgba(0,0,0,0.1) !important;
-        border-radius: 8px !important;
-        overflow: hidden !important;
-        margin-top: 4px !important;
-        background: #fff !important;
-    }
-
-    /* Search box styling */
-    .select2-container--bootstrap4 .select2-search--dropdown {
-        padding: 10px !important;
-        background: #f8f9fa !important;
-        border-bottom: 1px solid #e9ecef !important;
-    }
-
-    .select2-container--bootstrap4 .select2-search--dropdown .select2-search__field {
-        border: 1px solid #ced4da !important;
-        border-radius: 4px !important;
-        padding: 8px 12px !important;
-        height: 38px !important;
-        font-size: 14px !important;
-    }
-
-    /* Options container */
-    .select2-container--bootstrap4 .select2-results > .select2-results__options {
-        max-height: 400px !important;
-        overflow-y: auto !important;
-        scrollbar-width: thin !important;
-        scrollbar-color: #90A4AE #CFD8DC !important;
-    }
-
-    /* Option group headers */
-    .select2-container--bootstrap4 .select2-results__group {
-        padding: 12px 16px !important;
-        font-size: 12px !important;
-        font-weight: 600 !important;
-        text-transform: uppercase !important;
-        letter-spacing: 0.5px !important;
-        color: #1976D2 !important;
-        background: #F5F9FF !important;
-        border-bottom: 1px solid #E3F2FD !important;
-        margin: 0 !important;
-        position: sticky !important;
-        top: 0 !important;
-        z-index: 2 !important;
-    }
-
-    /* Option items */
-    .select2-container--bootstrap4 .select2-results__option {
-        padding: 10px 16px !important;
-        margin: 0 !important;
-        font-size: 14px !important;
-        line-height: 1.5 !important;
-        color: #37474F !important;
-        border-bottom: 1px solid #f0f0f0 !important;
-        transition: all 0.2s ease !important;
-        position: relative !important;
-        cursor: pointer !important;
-        display: flex !important;
-        align-items: center !important;
-    }
-
-    /* Option hover state */
-    .select2-container--bootstrap4 .select2-results__option--highlighted[aria-selected] {
-        background-color: #E3F2FD !important;
-        color: #1976D2 !important;
-    }
-
-    /* Selected option */
-    .select2-container--bootstrap4 .select2-results__option[aria-selected=true] {
-        background-color: #F5F9FF !important;
-        color: #1976D2 !important;
-        font-weight: 500 !important;
-    }
-
-    /* Selected option icon */
-    .select2-container--bootstrap4 .select2-results__option[aria-selected=true]::after {
-        content: '✓' !important;
-        position: absolute !important;
-        right: 16px !important;
-        color: #1976D2 !important;
-        font-weight: bold !important;
-    }
-
-    /* Option text wrapping */
-    .select2-results__option-text {
-        display: block !important;
-        white-space: normal !important;
-        word-wrap: break-word !important;
-        padding-right: 24px !important;
-    }
-
-    /* Scrollbar styling */
-    .select2-results__options::-webkit-scrollbar {
-        width: 6px !important;
-    }
-
-    .select2-results__options::-webkit-scrollbar-track {
-        background: #f1f1f1 !important;
-    }
-
-    .select2-results__options::-webkit-scrollbar-thumb {
-        background: #90A4AE !important;
-        border-radius: 3px !important;
-    }
-
-    .select2-results__options::-webkit-scrollbar-thumb:hover {
-        background: #78909C !important;
-    }
-
-    /* Dark mode support */
-    .dark-mode .select2-container--bootstrap4 .select2-dropdown {
-        background: #2d3748 !important;
-        border-color: #4a5568 !important;
-    }
-
-    .dark-mode .select2-container--bootstrap4 .select2-results__option {
-        color: #e2e8f0 !important;
-        border-bottom-color: #4a5568 !important;
-    }
-
-    .dark-mode .select2-container--bootstrap4 .select2-results__group {
-        background: #2d3748 !important;
-        color: #90cdf4 !important;
-        border-bottom-color: #4a5568 !important;
-    }
-
-    .dark-mode .select2-container--bootstrap4 .select2-results__option--highlighted[aria-selected] {
-        background-color: #2c5282 !important;
-        color: #fff !important;
-    }
-
-    .dark-mode .select2-container--bootstrap4 .select2-results__option[aria-selected=true] {
-        background-color: #2a4365 !important;
-        color: #90cdf4 !important;
-    }
-
-    .dark-mode .select2-container--bootstrap4 .select2-search--dropdown {
-        background: #2d3748 !important;
-        border-bottom-color: #4a5568 !important;
-    }
-
-    .dark-mode .select2-container--bootstrap4 .select2-search--dropdown .select2-search__field {
-        background: #2d3748 !important;
-        border-color: #4a5568 !important;
-        color: #e2e8f0 !important;
-    }
 </style>
 </head>
 <body class="hold-transition sidebar-mini layout-fixed">
@@ -331,40 +166,7 @@ include('../config/database.php');
                                                         <button class='btn btn-sm btn-success update-status' data-id='".$row['id']."' ".(($row['status'] != 'Active' && $row['status'] != 'In Progress') ? 'disabled' : '')."><i class='fas fa-check'></i></button>";
                                                 
                                                 // Add progress tracking button for community service sanctions
-                                                // Check if this is a first offense with community service or if there's an active first offense
-                                                $show_progress_button = false;
-                                                
-                                                // Check if this is the first offense with community service
-                                                if ($row['violation_count'] == 1 && preg_match('/(community service|university hours|university service|(\d+)\s*hours?)/i', $row['sanction'])) {
-                                                    $show_progress_button = true;
-                                                }
-                                                
-                                                // Check if there's an active first offense that requires hours
-                                                $check_first_offense_sql = "SELECT vr.id, vr.sanction, vr.status 
-                                                                          FROM violation_reports vr 
-                                                                          WHERE vr.student_id = ? 
-                                                                          AND vr.violation_count = 1 
-                                                                          AND vr.status IN ('Active', 'In Progress')
-                                                                          AND vr.sanction REGEXP '(community service|university hours|university service|[0-9]+\\s*hours?)'";
-                                                $check_stmt = $conn->prepare($check_first_offense_sql);
-                                                $check_stmt->bind_param("i", $row['student_id']);
-                                                $check_stmt->execute();
-                                                $active_first_result = $check_stmt->get_result();
-                                                
-                                                if ($active_first_result->num_rows > 0) {
-                                                    $show_progress_button = true;
-                                                }
-
-                                                // Show button for Active and In Progress, hide for Resolved
                                                 if (preg_match('/(community service|university hours|university service|(\d+)\s*hours?)/i', $row['sanction'])) {
-                                                    if ($row['status'] === 'Active' || $row['status'] === 'In Progress') {
-                                                        $show_progress_button = true;
-                                                    } elseif ($row['status'] === 'Resolved') {
-                                                        $show_progress_button = false;
-                                                    }
-                                                }
-
-                                                if ($show_progress_button) {
                                                     // Extract hours from sanction text
                                                     $total_hours = 40; // Default value
                                                     
@@ -386,7 +188,7 @@ include('../config/database.php');
                                                         $total_hours = $number_map[strtolower($matches[1])];
                                                     }
                                                     
-                                                    echo "<button class='btn btn-sm btn-info track-progress' 
+                                                    echo "<button class='btn btn-sm btn-info  track-progress' 
                                                           data-id='".$row['id']."' 
                                                           data-student='".$row['student_name']."' 
                                                           data-sanction='".$row['sanction']."'
@@ -643,14 +445,14 @@ include('../config/database.php');
                             <div class="form-group">
                                 <label>Current Progress:</label>
                                 <div class="progress mb-2" style="height: 25px; border-radius: 5px;">
-                                    <div class="progress-bar bg-info" role="progressbar" style="width: 0%; border-radius: 5px;"></div>
+                                    <div class="progress-bar bg-info" role="progressbar" id="progress_bar" style="width: 0%; border-radius: 5px;"></div>
                                 </div>
                                 <p id="progress_text" class="text-center">0 / 0 hours completed</p>
                             </div>
                             <div class="form-group">
                                 <label for="hours_completed">Add Hours:</label>
                                 <div class="input-group">
-                                    <input type="number" class="form-control" id="hours_completed" name="hours_completed" step="0.5" min="0.5" required>
+                                    <input type="number" class="form-control" name="hours_completed" step="0.5" min="0.5" required>
                                     <div class="input-group-append">
                                         <span class="input-group-text">hours</span>
                                     </div>
@@ -947,7 +749,6 @@ include('../config/database.php');
         let currentCompletedHours = 0;
         let totalRequiredHours = 0;
         let totalCompletedHours = 0;
-        let allViolationsHours = [];
 
         // Modify your existing track-progress click handler
         $(document).on('click', '.track-progress', function() {
@@ -980,27 +781,14 @@ include('../config/database.php');
                         // Store the hours information globally
                         totalRequiredHours = parseFloat(response.total_required_hours) || 0;
                         totalCompletedHours = parseFloat(response.total_completed_hours) || 0;
-                        allViolationsHours = [];
-                        currentViolationHours = 0;
-                        currentCompletedHours = 0;
                         
-                        // Store all violations hours information
+                        // Find current violation's hours
                         if (response.violations && response.violations.length > 0) {
-                            response.violations.forEach(v => {
-                                if (v.total_hours !== null) {
-                                    allViolationsHours.push({
-                                        id: v.id,
-                                        total_hours: parseFloat(v.total_hours) || 0,
-                                        completed_hours: parseFloat(v.completed_hours) || 0
-                                    });
-                                }
-                            });
-                            
-                            // Calculate total hours for all active sanctions
-                            allViolationsHours.forEach(v => {
-                                currentViolationHours += parseFloat(v.total_hours) || 0;
-                                currentCompletedHours += parseFloat(v.completed_hours) || 0;
-                            });
+                            const currentViolation = response.violations.find(v => v.id == id);
+                            if (currentViolation) {
+                                currentViolationHours = parseFloat(currentViolation.total_hours) || 0;
+                                currentCompletedHours = parseFloat(currentViolation.completed_hours) || 0;
+                            }
                         }
                         
                         // Update student and violation info
@@ -1010,65 +798,40 @@ include('../config/database.php');
                         let sanctionsText = '';
                         if (response.violations && response.violations.length > 0) {
                             response.violations.forEach((v, index) => {
-                                // Only show sanctions that have hours requirement
-                                if (v.total_hours !== null) {
-                                    sanctionsText += `${index + 1}. ${v.sanction} (${v.completed_hours}/${v.total_hours} hours completed)`;
-                                    if (v.status === 'In Progress') {
-                                        sanctionsText += ' - In Progress';
-                                    }
-                                    sanctionsText += '<br>';
+                                sanctionsText += `${index + 1}. ${v.sanction} (${v.completed_hours}/${v.total_hours} hours completed)`;
+                                if (v.status === 'Resolved') {
+                                    sanctionsText += ' - Resolved';
                                 }
+                                sanctionsText += '<br>';
                             });
-                        }
-                        if (!sanctionsText) {
-                            sanctionsText = 'No active service hours required.';
                         }
                         $('#sanction_text').html(sanctionsText);
                         
                         // Calculate total hours and completed hours
                         const totalHours = parseFloat(response.total_required_hours) || 0;
                         const completedHours = parseFloat(response.total_completed_hours) || 0;
-                        const remainingHours = Math.max(0, totalHours - completedHours);
+                        const remainingHours = totalHours - completedHours;
                         
                         // Update progress bar and text
-                        if (totalHours > 0) {
-                            const percentComplete = Math.min(100, (completedHours / totalHours) * 100);
-                            $('.progress-bar')
-                                .css('width', percentComplete + '%')
-                                .text(percentComplete.toFixed(1) + '%')
-                                .removeClass('bg-info bg-success bg-warning')
-                                .addClass(percentComplete >= 100 ? 'bg-success' : 
-                                        percentComplete >= 50 ? 'bg-info' : 'bg-warning');
-                            
-                            $('#progress_text').text(
-                                `${completedHours.toFixed(1)} / ${totalHours.toFixed(1)} total hours completed`
-                            );
-                        } else {
-                            // Hide progress bar when no hours are required
-                            $('.progress-bar')
-                                .css('width', '0%')
-                                .text('');
-                            $('#progress_text').text('No active service hours required');
-                        }
+                        const percentComplete = totalHours > 0 ? ((completedHours / totalHours) * 100) : 0;
+                        $('.progress-bar')
+                            .css('width', percentComplete + '%')
+                            .text(percentComplete.toFixed(1) + '%')
+                            .removeClass('bg-info bg-success')
+                            .addClass(percentComplete >= 100 ? 'bg-success' : 'bg-info');
+                        
+                        $('#progress_text').text(
+                            `${completedHours.toFixed(1)} / ${totalHours.toFixed(1)} total hours completed`
+                        );
                         
                         // Update progress history with sanction info
                         if (response.history && response.history.length > 0) {
                             let historyHtml = '';
-                            let totalHoursCompleted = 0;
-                            
                             response.history.forEach(function(entry) {
-                                totalHoursCompleted += parseFloat(entry.hours_completed);
-                                const remainingHours = Math.max(0, entry.total_hours - totalHoursCompleted);
-                                
                                 historyHtml += `<tr>
                                     <td>${entry.service_date}</td>
                                     <td>${parseFloat(entry.hours_completed).toFixed(1)}</td>
-                                    <td>
-                                        ${entry.remarks || '-'}<br>
-                                        <small class="text-muted">
-                                            Updated by: ${entry.updated_by || 'System'}
-                                        </small>
-                                    </td>
+                                    <td>${entry.remarks || '-'}</td>
                                 </tr>`;
                             });
                             $('#progress_history').html(historyHtml);
@@ -1076,27 +839,38 @@ include('../config/database.php');
                             $('#progress_history').html('<tr><td colspan="3" class="text-center">No progress history available</td></tr>');
                         }
                         
-                        // Show completion message only if ALL active sanctions are completed
-                        if (totalHours > 0 && remainingHours <= 0) {
+                        
+                        // Show completion message only if ALL sanctions are completed
+                        if (remainingHours <= 0) {
                             if (!$('#completion_message').length) {
                                 $('#progressForm').prepend(
                                     '<div id="completion_message" class="alert alert-success mb-3">' +
-                                    '<i class="fas fa-check-circle mr-2"></i>' +
                                     'All required service hours have been completed!' +
                                     '</div>'
-                                ); 
+                                );
                             }
                             $('#progressForm button[type="submit"]').prop('disabled', true);
-                            $('#hours_completed').prop('disabled', true);
-                            $('#service_datetime').prop('disabled', true);
-                            $('#remarks').prop('disabled', true);
                         } else {
                             $('#completion_message').remove();
                             $('#progressForm button[type="submit"]').prop('disabled', false);
-                            $('#hours_completed').prop('disabled', false);
-                            $('#service_datetime').prop('disabled', false);
-                            $('#remarks').prop('disabled', false);
                         }
+                        
+                        // Initialize datetime picker
+                        $('#service_datetime_picker').datetimepicker({
+                            format: 'MM/DD/YYYY hh:mm A',
+                            icons: {
+                                time: 'far fa-clock',
+                                date: 'far fa-calendar',
+                                up: 'fas fa-chevron-up',
+                                down: 'fas fa-chevron-down',
+                                previous: 'fas fa-chevron-left',
+                                next: 'fas fa-chevron-right',
+                                today: 'far fa-calendar-check',
+                                clear: 'fas fa-trash',
+                                close: 'fas fa-times'
+                            },
+                            useCurrent: false
+                        });
                     } else {
                         // Show error in the modal
                         $('#student_name').text('Error loading data');
@@ -1130,23 +904,26 @@ include('../config/database.php');
             });
         });
 
-        // Update the hours validation logic
+        // Add real-time validation for hours input
         $('#hours_completed').on('input', function() {
             const inputHours = parseFloat($(this).val()) || 0;
+            const remainingViolationHours = currentViolationHours - currentCompletedHours;
+            const remainingTotalHours = totalRequiredHours - totalCompletedHours;
             const validationMessage = $('#hours-validation-message');
             const validationText = $('#hours-validation-text');
             const submitButton = $('#progressForm button[type="submit"]');
-
-            // Calculate total remaining hours across all sanctions
-            let totalRemainingHours = currentViolationHours - currentCompletedHours;
 
             if (inputHours <= 0) {
                 validationMessage.show();
                 validationText.html('Hours must be greater than 0');
                 submitButton.prop('disabled', true);
-            } else if (inputHours > totalRemainingHours) {
+            } else if (inputHours > remainingViolationHours) {
                 validationMessage.show();
-                validationText.html(`Cannot exceed remaining hours (${totalRemainingHours.toFixed(1)} hours remaining)`);
+                validationText.html(`Cannot exceed remaining hours for this violation (${remainingViolationHours.toFixed(1)} hours remaining)`);
+                submitButton.prop('disabled', true);
+            } else if (inputHours > remainingTotalHours) {
+                validationMessage.show();
+                validationText.html(`Cannot exceed total remaining hours (${remainingTotalHours.toFixed(1)} hours remaining)`);
                 submitButton.prop('disabled', true);
             } else {
                 validationMessage.hide();
@@ -1162,7 +939,6 @@ include('../config/database.php');
             currentCompletedHours = 0;
             totalRequiredHours = 0;
             totalCompletedHours = 0;
-            allViolationsHours = [];
         });
 
         // Handle progress form submission
@@ -1809,40 +1585,6 @@ include('../config/database.php');
             $('#edit_offense').empty().append('<option value="">Select Offense</option>');
             $('#edit_sanction_display').val('');
         });
-
-        // Initialize Select2 with custom options
-        $('.select2bs4').select2({
-            theme: 'bootstrap4',
-            width: '100%',
-            placeholder: 'Select an offense',
-            allowClear: true,
-            minimumResultsForSearch: 5,
-            escapeMarkup: function(markup) {
-                return markup;
-            },
-            templateResult: function(data) {
-                if (!data.id) return data.text;
-                // Add custom formatting for options
-                return $('<div class="select2-results__option-text">' + 
-                        '<span class="option-title">' + data.text + '</span>' +
-                        '</div>');
-            },
-            templateSelection: function(data) {
-                if (!data.id) return data.text;
-                // Add custom formatting for selected option
-                return $('<div class="select2-selection-text">' + data.text + '</div>');
-            },
-            dropdownParent: $('#addViolationModal')
-        });
-
-        // Reinitialize Select2 when the modal is shown
-        $('#addViolationModal').on('shown.bs.modal', function () {
-            $('.select2bs4').select2('destroy').select2({
-                theme: 'bootstrap4',
-                dropdownParent: $('#addViolationModal'),
-                width: '100%'
-            });
-        });
     });
     </script>
 
@@ -2293,7 +2035,7 @@ include('../config/database.php');
         box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25) !important;
     }
 
-    .input-group .input-group-text {
+    .input-group-append .input-group-text {
         background-color: #fff !important;
         border: 1px solid #ced4da !important;
         border-left: none !important;
@@ -2301,7 +2043,7 @@ include('../config/database.php');
         padding: 0.375rem 0.75rem !important;
     }
 
-    .input-group .input-group-text i {
+    .input-group-append .input-group-text i {
         color: #6c757d !important;
     }
 

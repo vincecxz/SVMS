@@ -136,11 +136,26 @@ $result = mysqli_query($conn, $query);
                 </div>
             </section>
             
-                <!-- Floating Add Button -->
-                <button type="button" class="btn-float"  data-toggle="modal" data-target="#addStudentModal">
-                <i class="fas fa-plus fa-lg"></i>
-                <span class="btn-float-label">Add Student</span>
-            </button>
+            <!-- Floating Action Menu -->
+            <div class="fab-container">
+                <div class="fab fab-main">
+                    <i class="fas fa-plus"></i>
+                </div>
+                <ul class="fab-options">
+                    <li>
+                        <span class="fab-label">Add Student</span>
+                        <div class="fab-button fab-secondary" data-toggle="modal" data-target="#addStudentModal">
+                            <i class="fas fa-user-plus"></i>
+                        </div>
+                    </li>
+                    <li>
+                        <span class="fab-label">Import Students</span>
+                        <div class="fab-button fab-secondary" data-toggle="modal" data-target="#importStudentModal">
+                            <i class="fas fa-file-import"></i>
+                        </div>
+                    </li>
+                </ul>
+            </div>
 
             <!-- Main content -->
             <section class="content">
@@ -151,14 +166,6 @@ $result = mysqli_query($conn, $query);
                                 <div class="card-header">
                                     <div class="d-flex justify-content-between align-items-center">
                                         <h3 class="card-title">Student Records</h3>
-                                        <div>
-                                            <button type="button" class="btn btn-secondary btn-sm mr-2" data-toggle="modal" data-target="#importStudentModal">
-                                                <i class="fas fa-file-import"></i> Import Students
-                                            </button>
-                                            <!-- <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#addStudentModal">
-                                                <i class="fas fa-user-plus"></i> Add Student
-                                            </button> -->
-                                        </div>
                                     </div>
                                 </div>
                                 <div class="card-body">
@@ -182,7 +189,7 @@ $result = mysqli_query($conn, $query);
                                                                 <i class="fas fa-eye"></i>
                                                             </button>
                                                             <button type="button" class="btn btn-warning btn-sm" onclick="editStudent('<?php echo $row['id_number']; ?>')" title="Edit">
-                                                                <i class="fas fa-pencil-alt"></i>
+                                                                <i class="fas fa-edit"></i>
                                                             </button>
                                                             <button type="button" class="btn btn-success btn-sm" onclick="showGoodMoralModal('<?php echo $row['id']; ?>', '<?php echo $row['full_name']; ?>')" title="Generate Good Moral">
                                                                 <i class="fas fa-file-alt"></i>
@@ -208,51 +215,63 @@ $result = mysqli_query($conn, $query);
     </div>
 
     <!-- Add Student Modal -->
-    <div class="modal fade" id="addStudentModal">
-        <div class="modal-dialog">
+    <div class="modal fade" id="addStudentModal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
             <div class="modal-content">
-                <div class="modal-header">
-                    <h4 class="modal-title">Add Student</h4>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <div class="modal-header bg-primary">
+                    <h4 class="modal-title text-white">Add New Student</h4>
+                    <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
                 <form id="addStudentForm" method="POST">
                     <div class="modal-body">
-                        <div class="form-group">
-                            <label for="id_number">ID Number <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" id="id_number" name="id_number" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="full_name">Full Name <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" id="full_name" name="full_name" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="program">Program <span class="text-danger">*</span></label>
-                            <select class="form-control" id="program" name="program" required>
-                                <option value="">Select Program</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="year_section">Year and Section <span class="text-danger">*</span></label>
-                            <select class="form-control" id="year_section" name="year_section" required disabled>
-                                <option value="">Select Year and Section</option>
-                            </select>
-                            <input type="hidden" id="course_year_section" name="course_year_section">
-                        </div>
-                        <div class="form-group">
-                            <label for="contact_number">Contact Number</label>
-                            <input type="text" class="form-control" id="contact_number" name="contact_number" 
-                                   placeholder="09XXXXXXXXX" pattern="09[0-9]{9}">
-                            <small class="form-text text-muted">Format: 09XXXXXXXXX</small>
-                        </div>
-                        <div class="form-group">
-                            <label for="email">Email Address <span class="text-danger">*</span></label>
-                            <input type="email" class="form-control" id="email" name="email" required>
+                        <div class="row">
+                            <!-- Left Column -->
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="id_number">ID Number <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" id="id_number" name="id_number" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="full_name">Full Name <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" id="full_name" name="full_name" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="email">Email Address <span class="text-danger">*</span></label>
+                                    <input type="email" class="form-control" id="email" name="email" required>
+                                </div>
+                            </div>
+                            <!-- Right Column -->
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="program">Program <span class="text-danger">*</span></label>
+                                    <select class="form-control" id="program" name="program" required>
+                                        <option value="">Select Program</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="year_section">Year and Section <span class="text-danger">*</span></label>
+                                    <select class="form-control" id="year_section" name="year_section" required disabled>
+                                        <option value="">Select Year and Section</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="contact_number">Contact Number</label>
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text"><i class="fas fa-phone"></i></span>
+                                        </div>
+                                        <input type="text" class="form-control" id="contact_number" name="contact_number" 
+                                               placeholder="09XXXXXXXXX" pattern="09[0-9]{9}">
+                                    </div>
+                                    <small class="form-text text-muted">Format: 09XXXXXXXXX</small>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                        <!-- <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button> -->
                         <button type="submit" class="btn btn-primary">Add Student</button>
                     </div>
                 </form>
@@ -261,116 +280,139 @@ $result = mysqli_query($conn, $query);
     </div>
 
     <!-- View Student Modal -->
-    <div class="modal fade" id="viewStudentModal">
+    <div class="modal fade" id="viewStudentModal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="staticBackdropLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
-                <div class="modal-header">
-                    <h4 class="modal-title">Student Details</h4>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <div class="modal-header bg-primary">
+                    <h4 class="modal-title text-white">Student Details</h4>
+                    <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
                 <div class="modal-body">
-                    <div class="form-group">
-                        <label>ID Number</label>
-                        <p id="view_id_number" class="form-control-static"></p>
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-4 font-weight-bold">ID Number</div>
+                                <div class="col-md-8" id="view_id_number"></div>
+                            </div>
+                            <hr class="my-2">
+                            <div class="row">
+                                <div class="col-md-4 font-weight-bold">Full Name</div>
+                                <div class="col-md-8" id="view_full_name"></div>
+                            </div>
+                            <hr class="my-2">
+                            <div class="row">
+                                <div class="col-md-4 font-weight-bold">Program</div>
+                                <div class="col-md-8" id="view_program"></div>
+                            </div>
+                            <hr class="my-2">
+                            <div class="row">
+                                <div class="col-md-4 font-weight-bold">Section</div>
+                                <div class="col-md-8" id="view_section"></div>
+                            </div>
+                            <hr class="my-2">
+                            <div class="row">
+                                <div class="col-md-4 font-weight-bold">Contact Number</div>
+                                <div class="col-md-8" id="view_contact_number"></div>
+                            </div>
+                            <hr class="my-2">
+                            <div class="row">
+                                <div class="col-md-4 font-weight-bold">Email Address</div>
+                                <div class="col-md-8" id="view_email"></div>
+                            </div>
+                        </div>
                     </div>
-                    <div class="form-group">
-                        <label>Full Name</label>
-                        <p id="view_full_name" class="form-control-static"></p>
-                    </div>
-                    <div class="form-group">
-                        <label>Program</label>
-                        <p id="view_program" class="form-control-static"></p>
-                    </div>
-                    <div class="form-group">
-                        <label>Section</label>
-                        <p id="view_section" class="form-control-static"></p>
-                    </div>
-                    <div class="form-group">
-                        <label>Contact Number</label>
-                        <p id="view_contact_number" class="form-control-static"></p>
-                    </div>
-                    <div class="form-group">
-                        <label>Email Address</label>
-                        <p id="view_email" class="form-control-static"></p>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
                 </div>
             </div>
         </div>
     </div>
 
     <!-- Edit Student Modal -->
-    <div class="modal fade" id="editStudentModal">
-        <div class="modal-dialog">
+    <div class="modal fade" id="editStudentModal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
             <div class="modal-content">
-                <div class="modal-header">
+                <div class="modal-header bg-warning py-3">
                     <h4 class="modal-title">Edit Student</h4>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
-                <form id="editStudentForm" method="POST">
-                    <div class="modal-body">
+                <div class="modal-body p-4">
+                    <form id="editStudentForm" method="POST">
                         <input type="hidden" id="edit_student_id" name="student_id">
-                        <div class="form-group">
-                            <label for="edit_id_number">ID Number <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" id="edit_id_number" name="id_number" required>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    <label for="edit_id_number" class="mb-2">ID Number <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" id="edit_id_number" name="id_number" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    <label for="edit_full_name" class="mb-2">Full Name <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" id="edit_full_name" name="full_name" required>
+                                </div>
+                            </div>
                         </div>
-                        <div class="form-group">
-                            <label for="edit_full_name">Full Name <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" id="edit_full_name" name="full_name" required>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    <label for="edit_program" class="mb-2">Program <span class="text-danger">*</span></label>
+                                    <select class="form-control" id="edit_program" name="program" required>
+                                        <option value="">Select Program</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    <label for="edit_year_section" class="mb-2">Year and Section <span class="text-danger">*</span></label>
+                                    <select class="form-control" id="edit_year_section" name="year_section" required>
+                                        <option value="">Select Year and Section</option>
+                                    </select>
+                                    <input type="hidden" id="edit_course_year_section" name="course_year_section">
+                                </div>
+                            </div>
                         </div>
-                        <div class="form-group">
-                            <label for="edit_program">Program <span class="text-danger">*</span></label>
-                            <select class="form-control" id="edit_program" name="program" required>
-                                <option value="">Select Program</option>
-                            </select>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    <label for="edit_contact_number" class="mb-2">Contact Number</label>
+                                    <input type="text" class="form-control" id="edit_contact_number" name="contact_number" 
+                                           placeholder="09XXXXXXXXX" pattern="09[0-9]{9}">
+                                    <small class="form-text text-muted mt-1">Format: 09XXXXXXXXX</small>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    <label for="edit_email" class="mb-2">Email Address <span class="text-danger">*</span></label>
+                                    <input type="email" class="form-control" id="edit_email" name="email" required>
+                                </div>
+                            </div>
                         </div>
-                        <div class="form-group">
-                            <label for="edit_year_section">Year and Section <span class="text-danger">*</span></label>
-                            <select class="form-control" id="edit_year_section" name="year_section" required>
-                                <option value="">Select Year and Section</option>
-                            </select>
-                            <input type="hidden" id="edit_course_year_section" name="course_year_section">
+                        <div class="modal-footer px-0 pb-0 pt-3">
+                            <button type="submit" class="btn btn-warning">Save Changes</button>
                         </div>
-                        <div class="form-group">
-                            <label for="edit_contact_number">Contact Number</label>
-                            <input type="text" class="form-control" id="edit_contact_number" name="contact_number" 
-                                   placeholder="09XXXXXXXXX" pattern="09[0-9]{9}">
-                            <small class="form-text text-muted">Format: 09XXXXXXXXX</small>
-                        </div>
-                        <div class="form-group">
-                            <label for="edit_email">Email Address <span class="text-danger">*</span></label>
-                            <input type="email" class="form-control" id="edit_email" name="email" required>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                        <button type="submit" class="btn btn-primary">Save Changes</button>
-                    </div>
-                </form>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
 
     <!-- Import Student Modal -->
-    <div class="modal fade" id="importStudentModal">
+    <div class="modal fade" id="importStudentModal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="staticBackdropLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
-                <div class="modal-header">
+                <div class="modal-header bg-primary">
                     <h4 class="modal-title">Import Students</h4>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
+                    <button type="button" class="close text-black" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
                 </div>
                 <form id="importStudentForm" method="POST" enctype="multipart/form-data" action="import_students.php">
                     <div class="modal-body">
-                        <div class="alert alert-info">
-                            <p class="mb-0">Please download the template file and fill in the student details before importing.</p>
+                        <div class="alert">
+                            <p class="mb-0 text-red"><strong>Please download the template file and fill in the student details before importing.</strong></p>
                         </div>
                         <div class="form-group">
                             <a href="download_template.php" class="btn btn-outline-primary btn-block">
@@ -387,7 +429,7 @@ $result = mysqli_query($conn, $query);
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                        <!-- <button type="button" class="btn btn-default" data-dismiss="modal">Close</button> -->
                         <button type="submit" class="btn btn-primary">Import Students</button>
                     </div>
                 </form>
@@ -410,13 +452,14 @@ $result = mysqli_query($conn, $query);
                         <!-- Sanctions will be loaded here -->
                     </div>
                 </div>
-                <div class="modal-footer">
+                <!-- <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                </div>
+                </div> -->
             </div>
         </div>
+        
     </div>
-
+    <?php include '../includes/admin/footer.php'; ?>
     <!-- jQuery -->
     <script src="../plugins/jquery/jquery.min.js"></script>
     <!-- Bootstrap 4 -->
@@ -1063,127 +1106,319 @@ $result = mysqli_query($conn, $query);
         }
     </script>
     <style>
-           /* Floating Action Button */
-    .btn-float {
-        position: fixed !important;
-        bottom: 30px !important;
-        right: 30px !important;
-        width: 60px !important;
-        height: 60px !important;
-        background-color: #00b0ff !important;
-        border: none !important;
-        border-radius: 50% !important;
-        color: white !important;
-        font-size: 24px !important;
-        cursor: pointer !important;
-        box-shadow: 0 4px 10px rgba(0, 176, 255, 0.3) !important;
-        display: flex !important;
-        align-items: center !important;
-        justify-content: center !important;
-        transition: all 0.3s ease !important;
-        z-index: 1050 !important;
-        outline: none !important;
-    }
-
-    .btn-float:hover {
-        transform: scale(1.1) !important;
-        box-shadow: 0 6px 15px rgba(0, 176, 255, 0.4) !important;
-    }
-
-    .btn-float:active {
-        transform: scale(0.95) !important;
-    }
-
-    .btn-float i {
-        transition: all 0.3s ease !important;
-    }
-
-    .btn-float-label {
-        position: absolute !important;
-        right: 70px !important;
-        background-color: rgba(0, 0, 0, 0.8) !important;
-        color: white !important;
-        padding: 8px 12px !important;
-        border-radius: 4px !important;
-        font-size: 14px !important;
-        font-weight: 500 !important;
-        opacity: 0 !important;
-        visibility: hidden !important;
-        transition: all 0.3s ease !important;
-        white-space: nowrap !important;
-    }
-
-    .btn-float:hover .btn-float-label {
-        opacity: 1 !important;
-        visibility: visible !important;
-        right: 75px !important;
-    }
-
-    .btn-float-label:after {
-        content: '' !important;
-        position: absolute !important;
-        right: -5px !important;
-        top: 50% !important;
-        transform: translateY(-50%) !important;
-        width: 0 !important;
-        height: 0 !important;
-        border-top: 5px solid transparent !important;
-        border-bottom: 5px solid transparent !important;
-        border-left: 5px solid rgba(0, 0, 0, 0.8) !important;
-    }
-
-    @media (max-width: 768px) {
-        .btn-float {
-            width: 50px !important;
-            height: 50px !important;
-            bottom: 20px !important;
-            right: 20px !important;
-            font-size: 20px !important;
+        /* Floating Action Button Menu */
+        .fab-container {
+            position: fixed !important;
+            bottom: 30px !important;
+            right: 30px !important;
+            z-index: 1050 !important;
         }
-    }
 
-    /* PDF Preview Modal Styles */
-    #pdfPreviewModal .modal-dialog {
-        max-width: 90%;
-        margin: 1.75rem auto;
-    }
+        .fab-main {
+            width: 60px !important;
+            height: 60px !important;
+            background: #00b0ff !important;
+            border-radius: 50% !important;
+            box-shadow: 0 4px 10px rgba(0, 176, 255, 0.3) !important;
+            color: white !important;
+            text-align: center !important;
+            line-height: 60px !important;
+            cursor: pointer !important;
+            transition: all 0.3s ease !important;
+        }
 
-    #pdfPreviewModal .modal-content {
-        height: 90vh;
-    }
+        .fab-main:hover {
+            transform: scale(1.1) !important;
+            box-shadow: 0 6px 15px rgba(0, 176, 255, 0.4) !important;
+        }
 
-    #pdfPreviewModal .modal-body {
-        padding: 1rem;
-        background-color: #f8f9fa;
-    }
+        .fab-main i {
+            font-size: 24px !important;
+            transition: transform 0.3s ease !important;
+        }
 
-    #pdfPreviewContainer {
-        background-color: #fff;
-        border: 1px solid #dee2e6;
-        border-radius: 4px;
-        box-shadow: 0 0 10px rgba(0,0,0,0.1);
-    }
+        .fab-options {
+            list-style-type: none !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            position: absolute !important;
+            bottom: 70px !important;
+            right: 0 !important;
+            opacity: 0 !important;
+            visibility: hidden !important;
+            transition: all 0.3s ease !important;
+            transform: scale(0.5) !important;
+        }
 
-    #pdfPreviewFrame {
-        background-color: #fff;
-    }
+        .fab-container:hover .fab-options,
+        .fab-container:focus-within .fab-options {
+            opacity: 1 !important;
+            visibility: visible !important;
+            transform: scale(1) !important;
+        }
 
-    #pdfPreviewModal .modal-footer {
-        border-top: 1px solid #dee2e6;
-        padding: 1rem;
-        background-color: #fff;
-    }
+        .fab-options li {
+            display: flex !important;
+            align-items: center !important;
+            margin-bottom: 10px !important;
+        }
 
-    #downloadPdf {
-        background-color: #007bff;
-        border-color: #007bff;
-        padding: 0.5rem 1.5rem;
-    }
+        .fab-button {
+            width: 48px !important;
+            height: 48px !important;
+            border-radius: 50% !important;
+            text-align: center !important;
+            line-height: 48px !important;
+            cursor: pointer !important;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2) !important;
+            transition: all 0.3s ease !important;
+        }
 
-    #downloadPdf:hover {
-        background-color: #0056b3;
-        border-color: #0056b3;
-    }
+        .fab-secondary {
+            background: #fff !important;
+            color: #00b0ff !important;
+        }
+
+        .fab-secondary:hover {
+            background: #00b0ff !important;
+            color: #fff !important;
+            transform: scale(1.1) !important;
+        }
+
+        .fab-label {
+            padding: 6px 12px !important;
+            background: rgba(0, 0, 0, 0.8) !important;
+            color: white !important;
+            border-radius: 4px !important;
+            margin-right: 10px !important;
+            font-size: 14px !important;
+            font-weight: 500 !important;
+            position: relative !important;
+        }
+
+        .fab-label:after {
+            content: '' !important;
+            position: absolute !important;
+            right: -5px !important;
+            top: 50% !important;
+            transform: translateY(-50%) !important;
+            border-left: 5px solid rgba(0, 0, 0, 0.8) !important;
+            border-top: 5px solid transparent !important;
+            border-bottom: 5px solid transparent !important;
+        }
+
+        @media (max-width: 768px) {
+            .fab-container {
+                bottom: 20px !important;
+                right: 20px !important;
+            }
+
+            .fab-main {
+                width: 50px !important;
+                height: 50px !important;
+                line-height: 50px !important;
+            }
+
+            .fab-main i {
+                font-size: 20px !important;
+            }
+
+            .fab-button {
+                width: 40px !important;
+                height: 40px !important;
+                line-height: 40px !important;
+            }
+
+            .fab-label {
+                font-size: 12px !important;
+            }
+        }
+
+        /* PDF Preview Modal Styles */
+        #pdfPreviewModal .modal-dialog {
+            max-width: 90%;
+            margin: 1.75rem auto;
+        }
+
+        #pdfPreviewModal .modal-content {
+            height: 90vh;
+        }
+
+        #pdfPreviewModal .modal-body {
+            padding: 1rem;
+            background-color: #f8f9fa;
+        }
+
+        #pdfPreviewContainer {
+            background-color: #fff;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+
+        #pdfPreviewFrame {
+            background-color: #fff;
+        }
+
+        #pdfPreviewModal .modal-footer {
+            border-top: 1px solid #dee2e6;
+            padding: 1rem;
+            background-color: #fff;
+        }
+
+        #downloadPdf {
+            background-color: #007bff;
+            border-color: #007bff;
+            padding: 0.5rem 1.5rem;
+        }
+
+        #downloadPdf:hover {
+            background-color: #0056b3;
+            border-color: #0056b3;
+        }
+
+        /* Edit Student Modal Styles */
+        #editStudentModal .modal-dialog {
+            max-width: 700px;
+        }
+
+        #editStudentModal .form-control-sm {
+            height: calc(1.8em + 0.5rem + 2px);
+            padding: 0.375rem 0.75rem;
+            font-size: 0.95rem;
+        }
+
+        #editStudentModal .modal-header {
+            border-bottom: 1px solid #dee2e6;
+            padding: 0.8rem 1rem;
+        }
+
+        #editStudentModal .modal-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+
+        #editStudentModal .modal-body {
+            padding: 1rem 1.5rem;
+        }
+
+        #editStudentModal .form-group {
+            margin-bottom: 0.8rem;
+        }
+
+        #editStudentModal label {
+            font-size: 0.95rem;
+            font-weight: 500;
+            margin-bottom: 0.3rem;
+        }
+
+        #editStudentModal .form-text {
+            font-size: 0.85rem;
+            margin-top: 0.2rem;
+        }
+
+        #editStudentModal .btn-sm {
+            padding: 0.375rem 1.2rem;
+            font-size: 0.95rem;
+        }
+
+        #editStudentModal .modal-footer {
+            padding-top: 0.8rem;
+        }
+
+        /* Add these styles to your existing styles */
+        #addStudentModal .modal-content {
+            border: none;
+            border-radius: 8px;
+            box-shadow: 0 2px 20px rgba(0,0,0,0.1);
+        }
+
+        #addStudentModal .modal-header {
+            padding: 1.2rem;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        #addStudentModal .modal-body {
+            padding: 1.5rem;
+        }
+
+        #addStudentModal .form-group {
+            margin-bottom: 1.2rem;
+        }
+
+        #addStudentModal label {
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            color: #2c3e50;
+        }
+
+        #addStudentModal .form-control {
+            border-radius: 4px;
+            border: 1px solid #ced4da;
+            padding: 0.5rem 0.75rem;
+            transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+        }
+
+        #addStudentModal .form-control:focus {
+            border-color: #80bdff;
+            box-shadow: 0 0 0 0.2rem rgba(0,123,255,0.25);
+        }
+
+        #addStudentModal .input-group-text {
+            background-color: #f8f9fa;
+            border: 1px solid #ced4da;
+        }
+
+        #addStudentModal .modal-footer {
+            padding: 1rem 1.5rem;
+            border-top: 1px solid #e9ecef;
+        }
+
+        #addStudentModal .btn {
+            padding: 0.5rem 1.5rem;
+            font-weight: 500;
+        }
+
+        #addStudentModal .text-danger {
+            font-weight: bold;
+        }
+
+        #addStudentModal .form-text {
+            color: #6c757d;
+            font-size: 0.85rem;
+            margin-top: 0.25rem;
+        }
+
+        /* Dark mode support */
+        .dark-mode #addStudentModal .modal-content {
+            background-color: #343a40;
+            color: #fff;
+        }
+
+        .dark-mode #addStudentModal .modal-header {
+            border-bottom-color: #454d55;
+        }
+
+        .dark-mode #addStudentModal .modal-footer {
+            border-top-color: #454d55;
+        }
+
+        .dark-mode #addStudentModal .form-control {
+            background-color: #454d55;
+            border-color: #545b62;
+            color: #fff;
+        }
+
+        .dark-mode #addStudentModal .form-control:focus {
+            border-color: #80bdff;
+            box-shadow: 0 0 0 0.2rem rgba(0,123,255,0.25);
+        }
+
+        .dark-mode #addStudentModal .input-group-text {
+            background-color: #454d55;
+            border-color: #545b62;
+            color: #fff;
+        }
     </style>
 </body>
 </html> 

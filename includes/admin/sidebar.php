@@ -1,17 +1,20 @@
 <!-- Main Sidebar Container -->
-<aside class="main-sidebar sidebar-dark-primary elevation-4">
+<aside class="main-sidebar sidebar-dark-warning elevation-4">
     <!-- Brand Logo -->
     <a href="dashboard.php" class="brand-link">
-        <img src="../dist/img/AdminLTELogo.png" alt="AdminLTE Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
-        <span class="brand-text font-weight-light">SAO Admin</span>
+        <img src="../assets/img/logo.png" alt="AdminLTE Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
+        <span class="brand-text font-weight-light">SASO Admin</span>
     </a>
 
     <!-- Sidebar -->
     <div class="sidebar">
         <!-- Sidebar user panel (optional) -->
         <div class="user-panel mt-3 pb-3 mb-3 d-flex">
+            <div class="image">
+                <img src="../assets/img/admin.jpg" class="img-circle elevation-2" alt="User Image">
+            </div>
             <div class="info">
-                <a href="#" class="d-block">System Administrator</a>
+                <a href="#" class="d-block">Administrator</a>
             </div>
         </div>
 
@@ -20,7 +23,7 @@
             <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
                 <!-- Dashboard -->
                 <li class="nav-item">
-                    <a href="dashboard.php" class="nav-link">
+                    <a href="dashboard.php" class="nav-link <?php echo basename($_SERVER['PHP_SELF']) == 'dashboard.php' ? 'active' : ''; ?>">
                         <i class="nav-icon fas fa-tachometer-alt"></i>
                         <p>Dashboard</p>
                     </a>
@@ -31,7 +34,7 @@
                 
                 <!-- Student -->
                 <li class="nav-item">
-                    <a href="student_masterlist.php" class="nav-link">
+                    <a href="student_masterlist.php" class="nav-link <?php echo basename($_SERVER['PHP_SELF']) == 'student_masterlist.php' ? 'active' : ''; ?>">
                         <i class="nav-icon fas fa-user-graduate"></i>
                         <p>Student</p>
                     </a>
@@ -40,7 +43,7 @@
                
                 <!-- Programs & Sections -->
                 <li class="nav-item">
-                    <a href="manage_programs.php" class="nav-link">
+                    <a href="manage_programs.php" class="nav-link <?php echo basename($_SERVER['PHP_SELF']) == 'manage_programs.php' ? 'active' : ''; ?>">
                         <i class="nav-icon fas fa-graduation-cap"></i>
                         <p>Programs & Sections</p>
                     </a>
@@ -51,15 +54,15 @@
                 
                 <!-- Report Student Violation -->
                 <li class="nav-item">
-                    <a href="report_list.php" class="nav-link">
+                    <a href="report_list.php" class="nav-link <?php echo basename($_SERVER['PHP_SELF']) == 'report_list.php' ? 'active' : ''; ?>">
                         <i class="nav-icon fas fa-exclamation-triangle"></i>
                         <p>Report Student Violation</p>
                     </a>
                 </li>
                
                 <!-- Offenses & Sanction -->
-                <li class="nav-item has-treeview">
-                    <a href="#" class="nav-link">
+                <li class="nav-item has-treeview <?php echo in_array(basename($_SERVER['PHP_SELF']), ['manage_offenses.php', 'sec2.php']) ? 'menu-open' : ''; ?>">
+                    <a href="#" class="nav-link <?php echo in_array(basename($_SERVER['PHP_SELF']), ['manage_offenses.php', 'sec2.php']) ? 'active' : ''; ?>">
                         <i class="nav-icon fas fa-user-graduate"></i>
                         <p>
                             Offenses & Sanction
@@ -68,13 +71,13 @@
                     </a>
                     <ul class="nav nav-treeview">
                         <li class="nav-item">
-                            <a href="manage_offenses.php" class="nav-link">
+                            <a href="manage_offenses.php" class="nav-link <?php echo basename($_SERVER['PHP_SELF']) == 'manage_offenses.php' ? 'active' : ''; ?>">
                                 <i class="far fa-circle nav-icon"></i>
                                 <p>Sec 1 - Academic</p>
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="sec2.php" class="nav-link">
+                            <a href="sec2.php" class="nav-link <?php echo basename($_SERVER['PHP_SELF']) == 'sec2.php' ? 'active' : ''; ?>">
                                 <i class="far fa-circle nav-icon"></i>
                                 <p>Sec 2 - Non-Academic</p>
                             </a>
@@ -146,7 +149,7 @@ $(document).ready(function() {
 <style>
 .nav-treeview {
     display: none;
-    margin-left: 15px;
+    /* margin-left: 15px; */
 }
 
 .nav-item.has-treeview.menu-open > .nav-treeview {
@@ -160,13 +163,13 @@ $(document).ready(function() {
 .nav-link.active {
     background-color: #007bff !important;
     color: white !important;
-    border: 1px solid rgba(255, 255, 255, 0.4) !important;
+    /* border: 1px solid rgba(255, 255, 255, 0.4) !important; */
     border-radius: 4px;
 }
 
 .nav-treeview > .nav-item > .nav-link.active {
     background-color: rgba(255,255,255,0.2) !important;
-    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    /* border: 1px solid rgba(255, 255, 255, 0.2) !important; */
 }
 
 .nav-item.has-treeview > .nav-link {
@@ -195,5 +198,31 @@ $(document).ready(function() {
 
 .nav-sidebar .nav-item > .nav-link.active {
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.nav-sidebar .nav-link.active {
+    background-color:rgb(113, 117, 121) !important;
+    color: #fff !important;
+}
+
+.nav-sidebar .nav-link:hover {
+    background-color: rgba(255,255,255,.1);
+    color: #fff;
+}
+
+.nav-treeview > .nav-item > .nav-link.active {
+    background-color: rgba(255,255,255,.2) !important;
+}
+
+.nav-sidebar .menu-open > .nav-link {
+    background-color: rgba(255,255,255,.1) !important;
+}
+
+.nav-sidebar .menu-open > .nav-treeview {
+    display: block;
+}
+
+.nav-treeview {
+    display: none;
 }
 </style> 

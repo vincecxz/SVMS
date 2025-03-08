@@ -5,13 +5,13 @@ session_start();
 function check_auth($required_role = null) {
     // Check if user is logged in
     if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
-        header('Location: /SVMS-org/admin/dashboard.php?error=3'); // Not logged in
+        header('Location: /SVMS-main/admin/dashboard.php?error=3'); // Not logged in
         exit;
     }
 
     // If a specific role is required, check for it
     if ($required_role !== null && (!isset($_SESSION['role']) || $_SESSION['role'] !== $required_role)) {
-        header('Location: /SVMS-org/admin/dashboard.php?error=4'); // Unauthorized role
+        header('Location: /SVMS-main/admin/dashboard.php?error=4'); // Unauthorized role
         exit;
     }
 
@@ -20,7 +20,7 @@ function check_auth($required_role = null) {
     if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity'] > $session_lifetime)) {
         session_unset();
         session_destroy();
-        header('Location: /SVMS-org/admin/dashboard.php?error=5'); // Session expired
+        header('Location: /SVMS-main/admin/dashboard.php?error=5'); // Session expired
         exit;
     }
 
