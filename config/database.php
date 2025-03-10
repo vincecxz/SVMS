@@ -14,10 +14,10 @@ if (isLocalhost()) {
     $database = "saso";
 } else {
     // Hosting database credentials
-    $host = "sql311.infinityfree.com"; // Usually remains localhost on most hosting providers
-    $username = "if0_38486928"; // Your hosting username
-    $password = "Nj97T4m7XI"; // Your hosting password
-    $database = "if0_38486928_saso"; // Your hosting database name
+    $host = "localhost"; // Usually remains localhost on most hosting providers
+    $username = "root"; // Your hosting username
+    $password = ""; // Your hosting password
+    $database = "saso"; // Your hosting database name
 }
 
 // Create connection
