@@ -6,7 +6,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     header('Content-Type: application/json');
     
     // Validate required fields
-    $required_fields = ['id_number', 'full_name', 'program', 'year_section', 'email'];
+    $required_fields = ['id_number', 'full_name', 'program', 'year_section'];
     $missing_fields = [];
     
     foreach ($required_fields as $field) {
@@ -25,12 +25,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $program_id = mysqli_real_escape_string($conn, $_POST['program']);
     $section = mysqli_real_escape_string($conn, $_POST['year_section']);
     $contact_number = isset($_POST['contact_number']) ? mysqli_real_escape_string($conn, $_POST['contact_number']) : null;
-    $email = mysqli_real_escape_string($conn, $_POST['email']);
+    $email = isset($_POST['email']) ? mysqli_real_escape_string($conn, $_POST['email']) : null;
 
-    // Validate email format
-    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-        echo json_encode(['error' => 'Invalid email format']);
-        exit;
+    // Validate email format if provided
+    if (!empty($email)) {
+        $email_pattern = '/^[a-zA-ZñÑ0-9._%+-]+@[a-zA-ZñÑ0-9.-]+\.[a-zA-Z]{2,}$/';
+        if (!preg_match($email_pattern, $email)) {
+            echo json_encode(['error' => 'Invalid email format']);
+            exit;
+        }
     }
 
     try {
@@ -238,8 +241,8 @@ $result = mysqli_query($conn, $query);
                                     <input type="text" class="form-control" id="full_name" name="full_name" required>
                                 </div>
                                 <div class="form-group">
-                                    <label for="email">Email Address <span class="text-danger">*</span></label>
-                                    <input type="email" class="form-control" id="email" name="email" required>
+                                    <label for="email">Email Address</label>
+                                    <input type="email" class="form-control" id="email" name="email">
                                 </div>
                             </div>
                             <!-- Right Column -->
@@ -568,7 +571,7 @@ $result = mysqli_query($conn, $query);
                 e.preventDefault();
                 
                 // Validate required fields
-                var requiredFields = ['id_number', 'full_name', 'program', 'year_section', 'email'];
+                var requiredFields = ['id_number', 'full_name', 'program', 'year_section'];
                 var missingFields = [];
                 
                 requiredFields.forEach(function(field) {
@@ -725,7 +728,7 @@ $result = mysqli_query($conn, $query);
                 e.preventDefault();
                 
                 // Validate required fields
-                var requiredFields = ['edit_id_number', 'edit_full_name', 'edit_program', 'edit_year_section', 'edit_email'];
+                var requiredFields = ['edit_id_number', 'edit_full_name', 'edit_program', 'edit_year_section'];
                 var missingFields = [];
                 
                 requiredFields.forEach(function(field) {

@@ -658,7 +658,7 @@ include('../config/database.php');
                                     <!-- Offense -->
                                     <div class="form-group">
                                         <label class="font-weight-bold">Offense</label>
-                                        <select class="form-control " id="edit_offense" name="offense" required>
+                                        <select class="form-control select2" id="edit_offense" name="offense" required style="width: 100%;">
                                             <option value="">Select Offense</option>
                                         </select>
                                     </div>
@@ -1689,6 +1689,15 @@ include('../config/database.php');
                         loadOffensesForEdit(data.section_type, data.offense_level, data.offense_id);
                         
                         $('#edit_sanction_display').val(data.sanction);
+                        
+                        // Initialize select2 for edit_offense when modal is shown
+                        $('#edit_offense').select2({
+                            placeholder: 'Select an offense',
+                            allowClear: true,
+                            width: '100%',
+                            dropdownParent: $('#editReportModal')
+                        });
+                        
                         $('#editReportModal').modal('show');
                     } else {
                         Swal.fire({
@@ -1730,7 +1739,12 @@ include('../config/database.php');
                                 );
                             });
                             // Reinitialize Select2 for offense dropdown
-                            offenseSelect.trigger('change');
+                            offenseSelect.select2({
+                                placeholder: 'Select an offense',
+                                allowClear: true,
+                                width: '100%',
+                                dropdownParent: $('#editReportModal')
+                            });
                         }
                     }
                 });
@@ -1752,7 +1766,12 @@ include('../config/database.php');
                                 );
                             });
                             // Reinitialize Select2 for offense dropdown
-                            offenseSelect.trigger('change');
+                            offenseSelect.select2({
+                                placeholder: 'Select an offense',
+                                allowClear: true,
+                                width: '100%',
+                                dropdownParent: $('#editReportModal')
+                            });
                         }
                     }
                 });
@@ -1767,6 +1786,14 @@ include('../config/database.php');
 
             // Clear offense selection
             offenseSelect.empty().append('<option value="">Select Offense</option>');
+            
+            // Reinitialize select2
+            offenseSelect.select2({
+                placeholder: 'Select an offense',
+                allowClear: true,
+                width: '100%',
+                dropdownParent: $('#editReportModal')
+            });
 
             if (selectedSection === 'section1') {
                 // Section 1 - Academic
@@ -1788,6 +1815,18 @@ include('../config/database.php');
         $('#edit_offense_level').change(function() {
             const selectedLevel = $(this).val();
             const selectedSection = $('#edit_section').val();
+            const offenseSelect = $('#edit_offense');
+            
+            // Clear offense selection
+            offenseSelect.empty().append('<option value="">Select Offense</option>');
+            
+            // Reinitialize select2
+            offenseSelect.select2({
+                placeholder: 'Select an offense',
+                allowClear: true,
+                width: '100%',
+                dropdownParent: $('#editReportModal')
+            });
 
             if (selectedSection === 'section2' && selectedLevel) {
                 loadOffensesForEdit('section2', selectedLevel, null);
@@ -1935,6 +1974,16 @@ include('../config/database.php');
                 theme: 'bootstrap4',
                 dropdownParent: $('#addViolationModal'),
                 width: '100%'
+            });
+        });
+
+        // Reinitialize Select2 when the edit modal is shown
+        $('#editReportModal').on('shown.bs.modal', function() {
+            $('#edit_offense').select2({
+                placeholder: 'Select an offense',
+                allowClear: true,
+                width: '100%',
+                dropdownParent: $('#editReportModal')
             });
         });
     });

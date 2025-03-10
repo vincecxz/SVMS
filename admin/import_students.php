@@ -223,8 +223,8 @@ try {
         $validation_error = false;
         
         // Validate required fields (contact_number removed from required fields)
-        if (empty($id_number) || empty($full_name) || empty($program_code) || empty($section) || empty($email)) {
-            $errors[] = "Row $row_num: Required fields (ID Number, Full Name, Program, Section, Email) cannot be empty";
+        if (empty($id_number) || empty($full_name) || empty($program_code) || empty($section)) {
+            $errors[] = "Row $row_num: Required fields (ID Number, Full Name, Program, Section) cannot be empty";
             $validation_error = true;
         }
 
@@ -263,10 +263,14 @@ try {
             $validation_error = true;
         }
 
-        // Validate email format
-        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            $errors[] = "Row $row_num: Invalid email format for '$email'";
-            $validation_error = true;
+        // Validate email format only if provided
+        if (!empty($email)) {
+            // Use a more permissive email validation pattern that allows ñ and other special characters
+            $email_pattern = '/^[a-zA-ZñÑ0-9._%+-]+@[a-zA-ZñÑ0-9.-]+\.[a-zA-Z]{2,}$/';
+            if (!preg_match($email_pattern, $email)) {
+                $errors[] = "Row $row_num: Invalid email format for '$email'";
+                $validation_error = true;
+            }
         }
 
         // Validate contact number only if provided (now optional)
