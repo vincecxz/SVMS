@@ -217,7 +217,7 @@ CREATE TABLE `students` (
   `program_id` int(11) NOT NULL,
   `section` varchar(3) NOT NULL,
   `contact_number` varchar(11) DEFAULT NULL,
-  `email` varchar(100) NOT NULL,
+  `email` varchar(100) DEFAULT NULL,
   `password` varchar(255) DEFAULT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;

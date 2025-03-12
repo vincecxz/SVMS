@@ -8,7 +8,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 }
 
 // Validate required fields
-$required_fields = ['student_id', 'id_number', 'full_name', 'program', 'year_section', 'email'];
+$required_fields = ['student_id', 'id_number', 'full_name', 'program', 'year_section'];
 $missing_fields = [];
 
 foreach ($required_fields as $field) {
@@ -28,10 +28,10 @@ $full_name = mysqli_real_escape_string($conn, $_POST['full_name']);
 $program_id = mysqli_real_escape_string($conn, $_POST['program']);
 $section = mysqli_real_escape_string($conn, $_POST['year_section']);
 $contact_number = isset($_POST['contact_number']) ? mysqli_real_escape_string($conn, $_POST['contact_number']) : null;
-$email = mysqli_real_escape_string($conn, $_POST['email']);
+$email = isset($_POST['email']) && !empty($_POST['email']) ? mysqli_real_escape_string($conn, $_POST['email']) : null;
 
-// Validate email format
-if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+// Validate email format if provided
+if (!empty($email) && !filter_var($email, FILTER_VALIDATE_EMAIL)) {
     echo json_encode(['success' => false, 'error' => 'Invalid email format']);
     exit;
 }

@@ -203,7 +203,7 @@ $result = mysqli_query($conn, $query);
                                                     <td><?php echo htmlspecialchars($row['full_name']); ?></td>
                                                     <td><?php echo htmlspecialchars($row['program_name']); ?></td>
                                                     <td><?php echo htmlspecialchars($row['section']); ?></td>
-                                                    <td><?php echo htmlspecialchars($row['email']); ?></td>
+                                                    <td><?php echo !empty($row['email']) ? htmlspecialchars($row['email']) : 'N/A'; ?></td>
                                                 </tr>
                                             <?php endwhile; ?>
                                         </tbody>
@@ -388,8 +388,8 @@ $result = mysqli_query($conn, $query);
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group mb-3">
-                                    <label for="edit_email" class="mb-2">Email Address <span class="text-danger">*</span></label>
-                                    <input type="email" class="form-control" id="edit_email" name="email" required>
+                                    <label for="edit_email" class="mb-2">Email Address</label>
+                                    <input type="email" class="form-control" id="edit_email" name="email">
                                 </div>
                             </div>
                         </div>
@@ -944,7 +944,7 @@ $result = mysqli_query($conn, $query);
                     $('#view_program').text(student.program_name);
                     $('#view_section').text(student.section);
                     $('#view_contact_number').text(student.contact_number || 'N/A');
-                    $('#view_email').text(student.email);
+                    $('#view_email').text(student.email || 'N/A');
                     $('#viewStudentModal').modal('show');
                 } else {
                     Swal.fire({

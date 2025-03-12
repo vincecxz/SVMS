@@ -271,6 +271,9 @@ try {
                 $errors[] = "Row $row_num: Invalid email format for '$email'";
                 $validation_error = true;
             }
+        } else {
+            // Set email to NULL if empty
+            $record['email'] = null;
         }
 
         // Validate contact number only if provided (now optional)
