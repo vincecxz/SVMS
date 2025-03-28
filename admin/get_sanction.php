@@ -42,45 +42,25 @@ try {
     if ($offense_result && $offense_result->num_rows > 0) {
         $offense_data = $offense_result->fetch_assoc();
 
-        // Determine which sanction to apply based on violation count
+        // Get the appropriate sanction based on violation count
         $sanction = '';
         if ($violations_count == 0) {
             $sanction = $offense_data['first_sanction'];
-            $count_display = '1st offense' . " - " . $offense_data['first_sanction'];
-        } else if ($violations_count == 1) {
+        } elseif ($violations_count == 1) {
             $sanction = $offense_data['second_sanction'];
-            $count_display = '2nd offense' . " - " . $offense_data['second_sanction'];
-        } else if ($violations_count == 2) {
-            $sanction = $offense_data['third_sanction'];
-            $count_display = '3rd offense' . " - " . $offense_data['third_sanction'];
-            
-            // For 3rd offense with service hours, show 5 hours
-            if (preg_match('/(\d+)\s*hours?/i', $offense_data['third_sanction']) || 
-                stripos($offense_data['third_sanction'], 'service') !== false) {
-                $sanction = preg_replace('/(\d+)\s*hours?/i', '5 hours', $offense_data['third_sanction']);
-                if (!preg_match('/(\d+)\s*hours?/i', $sanction)) {
-                    $sanction .= " (5 hours)";
-                }
-            }
         } else {
-            $sanction = $offense_data['third_sanction']; // Use third sanction as base
-            $nth = ($violations_count + 1) . 'th';
-            $count_display = $nth . ' offense';
-            
-            // Check if the third sanction includes service hours
-            if (preg_match('/(\d+)\s*hours?/i', $offense_data['third_sanction']) || 
-                stripos($offense_data['third_sanction'], 'service') !== false) {
-                // For 4th offense and above, let admin input hours
-                $sanction = $count_display . ' - ' . $offense_data['third_sanction'];
-            }
+            $sanction = $offense_data['third_sanction'];
         }
-
-        // Add violation count and indicate if service hours are applicable
+        
+        // Add all available sanctions to the response
         $response['success'] = true;
-        $response['sanction'] = $count_display;
-        $response['has_service_hours'] = (preg_match('/(\d+)\s*hours?/i', $sanction) || 
-                                        stripos($offense_data['third_sanction'], 'service') !== false) ? true : false;
-        $response['sanction_text'] = $sanction;
+        $response['sanction'] = $sanction;
+        $response['violations_count'] = $violations_count;
+        $response['available_sanctions'] = [
+            'first_sanction' => $offense_data['first_sanction'],
+            'second_sanction' => $offense_data['second_sanction'],
+            'third_sanction' => $offense_data['third_sanction']
+        ];
     } else {
         $response['message'] = 'Offense not found';
     }
