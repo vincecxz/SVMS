@@ -365,12 +365,31 @@ include('../config/database.php');
                                                 echo "<td>".$level_display."</td>";
                                                 echo "<td><span class='truncate-text' data-toggle='tooltip' data-placement='top' title='".htmlspecialchars($row['offense_description'])."'>".$row['offense_description']."</span></td>";
                                                 echo "<td>".$row['violation_count']."</td>";
-                                                echo "<td><span class='truncate-text' data-toggle='tooltip' data-placement='top' title='".htmlspecialchars($row['sanction'])."'>".
-                                                    ($row['violation_count'] == 1 ? "1st offense" . '-' . $row['sanction'] : 
-                                                    ($row['violation_count'] == 2 ? "2nd offense" . '-' . $row['sanction'] : 
-                                                    ($row['violation_count'] == 3 ? "3rd offense" . '-' . $row['sanction'] : 
-                                                    $row['violation_count']."th offense"))).
-                                                    "</span></td>";
+                                                echo "<td><span class='truncate-text' data-toggle='tooltip' data-placement='top' title='".htmlspecialchars($row['sanction'])."'>";
+                                                
+                                                // Determine offense number based on sanction content
+                                                if (strpos(strtolower($row['sanction']), '1st offense') !== false || 
+                                                    strpos(strtolower($row['sanction']), 'first offense') !== false || 
+                                                    strpos(strtolower($row['sanction']), 'warning') !== false) {
+                                                    echo "1st offense - " . $row['sanction'];
+                                                } else if (strpos(strtolower($row['sanction']), '2nd offense') !== false || 
+                                                         strpos(strtolower($row['sanction']), 'second offense') !== false || 
+                                                         strpos(strtolower($row['sanction']), '5 days suspension') !== false) {
+                                                    echo "2nd offense - " . $row['sanction'];
+                                                } else if (strpos(strtolower($row['sanction']), '3rd offense') !== false || 
+                                                         strpos(strtolower($row['sanction']), 'third offense') !== false || 
+                                                         strpos(strtolower($row['sanction']), '15 days suspension') !== false) {
+                                                    echo "3rd offense - " . $row['sanction'];
+                                                } else {
+                                                    // If no specific offense number is found in sanction, use violation count
+                                                    echo $row['violation_count'] . 
+                                                         ($row['violation_count'] == 1 ? "st" : 
+                                                         ($row['violation_count'] == 2 ? "nd" : 
+                                                         ($row['violation_count'] == 3 ? "rd" : "th"))) . 
+                                                         " offense - " . $row['sanction'];
+                                                }
+                                                
+                                                echo "</span></td>";
                                                 echo "<td><span class='badge badge-".
                                                     ($row['status'] == 'Active' ? 'danger' : 
                                                     ($row['status'] == 'In Progress' ? 'orange' : 'success'))."'>".$row['status']."</span></td>";
@@ -562,7 +581,9 @@ include('../config/database.php');
                                     <!-- Sanction Display -->
                                     <div class="form-group">
                                         <label>Corresponding Sanction</label>
-                                        <input type="text" class="form-control" id="sanction_display" readonly>
+                                        <select class="form-control" id="sanction_display" name="sanction" required>
+                                            <option value="">Select Sanction</option>
+                                        </select>
                                     </div>
 
                                     <!-- Custom Sanction Option -->
@@ -689,7 +710,9 @@ include('../config/database.php');
                                     <!-- Corresponding Sanction -->
                                     <div class="form-group mb-3">
                                         <label class="font-weight-bold">Corresponding Sanction</label>
-                                        <input type="text" class="form-control" id="edit_sanction_display" readonly>
+                                        <select class="form-control" id="edit_sanction_display" name="sanction" required>
+                                            <option value="">Select Sanction</option>
+                                        </select>
                                     </div>
 
                                     <!-- Custom Sanction Option -->
@@ -1477,8 +1500,8 @@ include('../config/database.php');
             }
         });
 
-        // Handle offense change
-        $('#offense').change(function() {
+        // Handle offense change for add form
+        $('#offense').on('change', function() {
             const selectedOffense = $(this).val();
             const selectedStudent = $('#student').val();
             const selectedSection = $('#section').val();
@@ -1496,43 +1519,53 @@ include('../config/database.php');
                     },
                     success: function(response) {
                         if (response.success) {
-                            $('#sanction_display').val(response.sanction);
+                            // Clear existing options
+                            $('#sanction_display').empty();
+                            $('#sanction_display').append('<option value="">Select Sanction</option>');
                             
-                            // Show service hours input if it's 4th offense or beyond
-                            if (response.sanction.match(/(\d+)(?:st|nd|rd|th)\s+offense/i)) {
-                                const offenseNumber = parseInt(response.sanction.match(/(\d+)(?:st|nd|rd|th)\s+offense/i)[1]);
-                                if (offenseNumber >= 4) {
-                                    $('#service_hours_container').show();
-                                    
-                                    // Extract hours from sanction text if available
-                                    const hoursMatch = response.sanction.match(/(\d+)\s*hours?/i);
-                                    if (hoursMatch) {
-                                        $('#service_hours').val(hoursMatch[1]);
-                                    }
+                            const availableSanctions = response.available_sanctions;
+                            const autoLoadedSanction = response.sanction;
+                            
+                            // Add sanctions only if they exist
+                            if (availableSanctions.first_sanction) {
+                                if (availableSanctions.first_sanction === autoLoadedSanction) {
+                                    $('#sanction_display').append(`<option value="${availableSanctions.first_sanction}">1st offense - ${availableSanctions.first_sanction} (Auto-loaded)</option>`);
                                 } else {
-                                    $('#service_hours_container').hide();
-                                    $('#service_hours').val('');
+                                    $('#sanction_display').append(`<option value="${availableSanctions.first_sanction}">1st offense - ${availableSanctions.first_sanction}</option>`);
                                 }
-                            } else {
-                                $('#service_hours_container').hide();
-                                $('#service_hours').val('');
                             }
+                            
+                            if (availableSanctions.second_sanction) {
+                                if (availableSanctions.second_sanction === autoLoadedSanction) {
+                                    $('#sanction_display').append(`<option value="${availableSanctions.second_sanction}">2nd offense - ${availableSanctions.second_sanction} (Auto-loaded)</option>`);
+                                } else {
+                                    $('#sanction_display').append(`<option value="${availableSanctions.second_sanction}">2nd offense - ${availableSanctions.second_sanction}</option>`);
+                                }
+                            }
+                            
+                            if (availableSanctions.third_sanction) {
+                                if (availableSanctions.third_sanction === autoLoadedSanction) {
+                                    $('#sanction_display').append(`<option value="${availableSanctions.third_sanction}">3rd offense - ${availableSanctions.third_sanction} (Auto-loaded)</option>`);
+                                } else {
+                                    $('#sanction_display').append(`<option value="${availableSanctions.third_sanction}">3rd offense - ${availableSanctions.third_sanction}</option>`);
+                                }
+                            }
+                            
+                            // Select the auto-loaded sanction by default
+                            $('#sanction_display').val(autoLoadedSanction);
                         } else {
-                            $('#sanction_display').val('');
-                            $('#service_hours_container').hide();
-                            $('#service_hours').val('');
+                            $('#sanction_display').empty();
+                            $('#sanction_display').append('<option value="">Select Sanction</option>');
                         }
                     },
                     error: function() {
-                        $('#sanction_display').val('Error fetching sanction');
-                        $('#service_hours_container').hide();
-                        $('#service_hours').val('');
+                        $('#sanction_display').empty();
+                        $('#sanction_display').append('<option value="">Select Sanction</option>');
                     }
                 });
             } else {
-                $('#sanction_display').val('');
-                $('#service_hours_container').hide();
-                $('#service_hours').val('');
+                $('#sanction_display').empty();
+                $('#sanction_display').append('<option value="">Select Sanction</option>');
             }
         });
 
@@ -1546,13 +1579,18 @@ include('../config/database.php');
                 section: $('#section').val(),
                 offense_level: $('#offense_level').val(),
                 offense: $('#offense').val(),
+<<<<<<< HEAD
                 sanction: $('#use_custom_sanction').is(':checked') ? $('#custom_sanction').val() : $('#sanction_display').val(),
                 service_hours: $('#service_hours').val() || null,
                 is_custom_sanction: $('#use_custom_sanction').is(':checked')
+=======
+                sanction: $('#sanction_display').val(), // This will now get the selected sanction value
+                service_hours: $('#service_hours').val() || null
+>>>>>>> 9250123c257964d17d4b27f2b37b053b4eceba57
             };
 
             // Validate form data
-            if (!formData.student || !formData.incident_datetime || !formData.section || !formData.offense) {
+            if (!formData.student || !formData.incident_datetime || !formData.section || !formData.offense || !formData.sanction) {
                 Swal.fire({
                     icon: 'error',
                     title: 'Error',
@@ -1561,6 +1599,7 @@ include('../config/database.php');
                 return;
             }
 
+<<<<<<< HEAD
             // Validate custom sanction if enabled
             if (formData.is_custom_sanction) {
                 if (!formData.sanction.trim()) {
@@ -1585,10 +1624,12 @@ include('../config/database.php');
                 }
             }
 
+=======
+>>>>>>> 9250123c257964d17d4b27f2b37b053b4eceba57
             // Show loading state
             Swal.fire({
                 title: 'Processing...',
-                text: 'Please wait while we save the report and send the notification.',
+                text: 'Please wait while we save the report.',
                 allowOutsideClick: false,
                 allowEscapeKey: false,
                 showConfirmButton: false,
@@ -1605,10 +1646,6 @@ include('../config/database.php');
                 dataType: 'json',
                 success: function(response) {
                     if (response.success) {
-
-                        let message = 'Violation report has been saved successfully.';
-                        let icon = 'success';
-                        // Simple success message without email
                         Swal.fire({
                             icon: 'success',
                             title: 'Success',
@@ -1628,7 +1665,7 @@ include('../config/database.php');
                 error: function(xhr, status, error) {
                     Swal.close();  // Close the loading dialog
                     console.error('Save AJAX error:', error);
-                    console.log('XHR:', xhr.responseText);  // Log the full response
+                    console.log('XHR:', xhr.responseText);
                     
                     Swal.fire({
                         icon: 'error',
@@ -2090,17 +2127,53 @@ include('../config/database.php');
                     },
                     success: function(response) {
                         if (response.success) {
-                            $('#edit_sanction_display').val(response.sanction);
+                            // Clear existing options
+                            $('#edit_sanction_display').empty();
+                            $('#edit_sanction_display').append('<option value="">Select Sanction</option>');
+                            
+                            const availableSanctions = response.available_sanctions;
+                            const autoLoadedSanction = response.sanction;
+                            
+                            // Add sanctions only if they exist
+                            if (availableSanctions.first_sanction) {
+                                if (availableSanctions.first_sanction === autoLoadedSanction) {
+                                    $('#edit_sanction_display').append(`<option value="${availableSanctions.first_sanction}">1st offense - ${availableSanctions.first_sanction} (Auto-loaded)</option>`);
+                                } else {
+                                    $('#edit_sanction_display').append(`<option value="${availableSanctions.first_sanction}">1st offense - ${availableSanctions.first_sanction}</option>`);
+                                }
+                            }
+                            
+                            if (availableSanctions.second_sanction) {
+                                if (availableSanctions.second_sanction === autoLoadedSanction) {
+                                    $('#edit_sanction_display').append(`<option value="${availableSanctions.second_sanction}">2nd offense - ${availableSanctions.second_sanction} (Auto-loaded)</option>`);
+                                } else {
+                                    $('#edit_sanction_display').append(`<option value="${availableSanctions.second_sanction}">2nd offense - ${availableSanctions.second_sanction}</option>`);
+                                }
+                            }
+                            
+                            if (availableSanctions.third_sanction) {
+                                if (availableSanctions.third_sanction === autoLoadedSanction) {
+                                    $('#edit_sanction_display').append(`<option value="${availableSanctions.third_sanction}">3rd offense - ${availableSanctions.third_sanction} (Auto-loaded)</option>`);
+                                } else {
+                                    $('#edit_sanction_display').append(`<option value="${availableSanctions.third_sanction}">3rd offense - ${availableSanctions.third_sanction}</option>`);
+                                }
+                            }
+                            
+                            // Select the auto-loaded sanction by default
+                            $('#edit_sanction_display').val(autoLoadedSanction);
                         } else {
-                            $('#edit_sanction_display').val('');
+                            $('#edit_sanction_display').empty();
+                            $('#edit_sanction_display').append('<option value="">Select Sanction</option>');
                         }
                     },
                     error: function() {
-                        $('#edit_sanction_display').val('Error fetching sanction');
+                        $('#edit_sanction_display').empty();
+                        $('#edit_sanction_display').append('<option value="">Select Sanction</option>');
                     }
                 });
             } else {
-                $('#edit_sanction_display').val('');
+                $('#edit_sanction_display').empty();
+                $('#edit_sanction_display').append('<option value="">Select Sanction</option>');
             }
         });
 
@@ -2155,6 +2228,7 @@ include('../config/database.php');
             });
         });
 
+<<<<<<< HEAD
         // Initialize datepicker
         $('#incident_datetime_picker').datetimepicker({
             format: 'MM/DD/YYYY hh:mm A'
@@ -2208,6 +2282,76 @@ include('../config/database.php');
                 }
             });
         });
+=======
+        // Handle offense selection
+        $('#offense').on('change', function() {
+            const selectedOffense = $(this).val();
+            const selectedStudent = $('#student').val();
+            const selectedSection = $('#section').val();
+            const selectedLevel = $('#offense_level').val();
+            
+            if (selectedOffense && selectedStudent) {
+                $.ajax({
+                    url: 'get_sanction.php',
+                    method: 'POST',
+                    data: {
+                        student_id: selectedStudent,
+                        offense_id: selectedOffense,
+                        section: selectedSection,
+                        level: selectedLevel
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            // Clear existing options
+                            $('#sanction_display').empty();
+                            $('#sanction_display').append('<option value="">Select Sanction</option>');
+                            
+                            const availableSanctions = response.available_sanctions;
+                            const autoLoadedSanction = response.sanction;
+                            
+                            // Add sanctions only if they exist
+                            if (availableSanctions.first_sanction) {
+                                if (availableSanctions.first_sanction === autoLoadedSanction) {
+                                    $('#sanction_display').append(`<option value="${availableSanctions.first_sanction}">1st offense - ${availableSanctions.first_sanction} (Auto-loaded)</option>`);
+                                } else {
+                                    $('#sanction_display').append(`<option value="${availableSanctions.first_sanction}">1st offense - ${availableSanctions.first_sanction}</option>`);
+                                }
+                            }
+                            
+                            if (availableSanctions.second_sanction) {
+                                if (availableSanctions.second_sanction === autoLoadedSanction) {
+                                    $('#sanction_display').append(`<option value="${availableSanctions.second_sanction}">2nd offense - ${availableSanctions.second_sanction} (Auto-loaded)</option>`);
+                                } else {
+                                    $('#sanction_display').append(`<option value="${availableSanctions.second_sanction}">2nd offense - ${availableSanctions.second_sanction}</option>`);
+                                }
+                            }
+                            
+                            if (availableSanctions.third_sanction) {
+                                if (availableSanctions.third_sanction === autoLoadedSanction) {
+                                    $('#sanction_display').append(`<option value="${availableSanctions.third_sanction}">3rd offense - ${availableSanctions.third_sanction} (Auto-loaded)</option>`);
+                                } else {
+                                    $('#sanction_display').append(`<option value="${availableSanctions.third_sanction}">3rd offense - ${availableSanctions.third_sanction}</option>`);
+                                }
+                            }
+                            
+                            // Select the auto-loaded sanction by default
+                            $('#sanction_display').val(autoLoadedSanction);
+                        } else {
+                            $('#sanction_display').empty();
+                            $('#sanction_display').append('<option value="">Select Sanction</option>');
+                        }
+                    },
+                    error: function() {
+                        $('#sanction_display').empty();
+                        $('#sanction_display').append('<option value="">Select Sanction</option>');
+                    }
+                });
+            } else {
+                $('#sanction_display').empty();
+                $('#sanction_display').append('<option value="">Select Sanction</option>');
+            }
+        });
+>>>>>>> 9250123c257964d17d4b27f2b37b053b4eceba57
     });
     </script>
 
