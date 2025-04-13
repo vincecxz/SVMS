@@ -1,9 +1,0 @@
-Open Terminal Dayun type "composer install" para mu work ang spreadsheet
-
-Credentials:
-Username: admin
-Password: admin123
-
-
-
-
