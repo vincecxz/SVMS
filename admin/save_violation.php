@@ -18,7 +18,10 @@ $incident_datetime = mysqli_real_escape_string($conn, $_POST['incident_datetime'
 $section = mysqli_real_escape_string($conn, $_POST['section']);
 $offense_id = mysqli_real_escape_string($conn, $_POST['offense']);
 $offense_level = isset($_POST['offense_level']) ? mysqli_real_escape_string($conn, $_POST['offense_level']) : null;
+$sanction = mysqli_real_escape_string($conn, $_POST['sanction']); // Get the selected sanction directly
 $service_hours = isset($_POST['service_hours']) ? mysqli_real_escape_string($conn, $_POST['service_hours']) : null;
+$is_custom_sanction = isset($_POST['is_custom_sanction']) ? filter_var($_POST['is_custom_sanction'], FILTER_VALIDATE_BOOLEAN) : false;
+$custom_sanction = isset($_POST['sanction']) && $is_custom_sanction ? mysqli_real_escape_string($conn, $_POST['sanction']) : null;
 
 // Convert datetime to MySQL format
 $incident_datetime = date('Y-m-d H:i:s', strtotime($incident_datetime));
@@ -102,42 +105,39 @@ try {
             }
         }
 
-        // Insert new violation report
-        $query = "INSERT INTO violation_reports (
-            student_id,
-            incident_datetime,
-            section_type,
-            offense_id,
-            offense_level,
-            violation_count,
-            sanction,
-            created_at,
-            status,
-            total_hours,
-            completed_hours
-        ) VALUES (
-            '$student_id',
-            '$incident_datetime',
-            '$section',
-            '$offense_id',
-            " . ($offense_level ? "'$offense_level'" : "NULL") . ",
-            $violation_count,
-            '$sanction',
-            '$current_timestamp',
-            'Active',
-            " . ($total_hours !== NULL ? $total_hours : "NULL") . ",
-            0
-        )";
+    // Insert new violation report
+    $query = "INSERT INTO violation_reports (
+        student_id,
+        incident_datetime,
+        section_type,
+        offense_id,
+        offense_level,
+        violation_count,
+        sanction,
+        created_at,
+        status,
+        total_hours,
+        completed_hours
+    ) VALUES (
+        '$student_id',
+        '$incident_datetime',
+        '$section',
+        '$offense_id',
+        " . ($offense_level ? "'$offense_level'" : "NULL") . ",
+        $violation_count,
+        '$sanction',
+        '$current_timestamp',
+        'Active',
+        " . ($total_hours !== NULL ? $total_hours : "NULL") . ",
+        0
+    )";
 
-        if ($conn->query($query)) {
-            $conn->commit();
-            $response['success'] = true;
-            $response['message'] = 'Violation report saved successfully';
-        } else {
-            throw new Exception('Error saving violation report: ' . $conn->error);
-        }
+    if ($conn->query($query)) {
+        $conn->commit();
+        $response['success'] = true;
+        $response['message'] = 'Violation report saved successfully';
     } else {
-        throw new Exception('Error retrieving offense details: ' . $conn->error);
+        throw new Exception('Error saving violation report: ' . $conn->error);
     }
 } catch (Exception $e) {
     $conn->rollback();
