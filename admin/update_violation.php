@@ -10,8 +10,6 @@ if(isset($_POST['violation_id'])) {
     $offense_level = $_POST['offense_level'];
     $offense_id = $_POST['offense'];
     $sanction = $_POST['sanction'];
-    $is_custom_sanction = isset($_POST['is_custom_sanction']) ? filter_var($_POST['is_custom_sanction'], FILTER_VALIDATE_BOOLEAN) : false;
-    $service_hours = isset($_POST['service_hours']) ? floatval($_POST['service_hours']) : null;
     
     // Convert datetime to MySQL format
     $incident_datetime = date('Y-m-d H:i:s', strtotime($incident_datetime));
@@ -50,28 +48,18 @@ if(isset($_POST['violation_id'])) {
                     offense_id = ?,
                     offense_level = ?,
                     sanction = ?,
-                    total_hours = ?,
                     updated_at = CURRENT_TIMESTAMP
                     WHERE id = ?";
 
     $stmt = $conn->prepare($update_query);
-    $stmt->bind_param("isssssdi", 
-        $student_id, 
-        $incident_datetime, 
-        $section, 
-        $offense_id, 
-        $offense_level, 
-        $sanction,
-        $service_hours,
-        $violation_id
-    );
+    $stmt->bind_param("isssssi", $student_id, $incident_datetime, $section, $offense_id, $offense_level, $sanction, $violation_id);
 
     if ($stmt->execute()) {
         $conn->commit();
         echo json_encode(['success' => true, 'message' => 'Violation report updated successfully']);
     } else {
         $conn->rollback();
-        echo json_encode(['success' => false, 'message' => 'Failed to update violation report: ' . $conn->error]);
+        echo json_encode(['success' => false, 'message' => 'Error updating violation report: ' . $conn->error]);
     }
     
     $stmt->close();

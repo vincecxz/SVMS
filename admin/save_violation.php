@@ -19,8 +19,6 @@ $section = mysqli_real_escape_string($conn, $_POST['section']);
 $offense_id = mysqli_real_escape_string($conn, $_POST['offense']);
 $offense_level = isset($_POST['offense_level']) ? mysqli_real_escape_string($conn, $_POST['offense_level']) : null;
 $service_hours = isset($_POST['service_hours']) ? mysqli_real_escape_string($conn, $_POST['service_hours']) : null;
-$is_custom_sanction = isset($_POST['is_custom_sanction']) ? filter_var($_POST['is_custom_sanction'], FILTER_VALIDATE_BOOLEAN) : false;
-$custom_sanction = isset($_POST['sanction']) && $is_custom_sanction ? mysqli_real_escape_string($conn, $_POST['sanction']) : null;
 
 // Convert datetime to MySQL format
 $incident_datetime = date('Y-m-d H:i:s', strtotime($incident_datetime));
@@ -47,10 +45,6 @@ try {
     // Remove the automatic status update of previous violations
     // Previous violations should keep their current status
     // They will only change status when hours are added or completed
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> parent of 9250123 (Refactor sanction handling and UI updates for violation reports)
 
     // Get offense details to determine sanction
     $offense_table = ($section === 'section1') ? 'sec1' : 'sec2';
@@ -107,67 +101,6 @@ try {
                 }
             }
         }
-<<<<<<< HEAD
-=======
->>>>>>> parent of 9250123 (Refactor sanction handling and UI updates for violation reports)
-
-    // Get offense details to determine sanction
-    $offense_table = ($section === 'section1') ? 'sec1' : 'sec2';
-    $offense_query = "SELECT * FROM $offense_table WHERE id = '$offense_id'";
-    $offense_result = $conn->query($offense_query);
-
-    if ($offense_result && $offense_result->num_rows > 0) {
-        $offense_data = $offense_result->fetch_assoc();
-
-        // Determine which sanction to apply based on violation count
-        if ($violation_count <= 1) {
-            $sanction = $offense_data['first_sanction'];
-            // Extract hours from first sanction if present
-            $total_hours = extractHoursFromSanction($offense_data['first_sanction']);
-        } else if ($violation_count == 2) {
-            $sanction = $offense_data['second_sanction'];
-            // Extract hours from second sanction if present
-            $total_hours = extractHoursFromSanction($offense_data['second_sanction']);
-        } else if ($violation_count == 3) {
-            $sanction = $offense_data['third_sanction'];
-            // Extract hours from third sanction
-            $total_hours = extractHoursFromSanction($offense_data['third_sanction']);
-        } else {
-            // For 4th offense and above
-            $sanction = ($violation_count) . 'th offense';
-            
-            // Use manually input hours if provided, otherwise calculate them
-            if ($service_hours !== null && $service_hours !== '') {
-                $total_hours = floatval($service_hours);
-                $sanction .= " ($total_hours hours)";
-            } else {
-                // Check if the third sanction includes service hours
-                if (preg_match('/(\d+)\s*hours?/i', $offense_data['third_sanction']) || 
-                    stripos($offense_data['third_sanction'], 'service') !== false) {
-                    
-                    // For subsequent offenses, add 5 hours to the previous requirement
-                    $base_hours = extractHoursFromSanction($offense_data['third_sanction']);
-                    if ($base_hours === null) {
-                        $base_hours = 5; // Default if no hours specified
-                    }
-                    $additional_hours = ($violation_count - 3) * 5; // Add 5 hours for each offense beyond 3rd
-                    $total_hours = $base_hours + $additional_hours;
-                    
-                    // Add base sanction text for reference
-                    $sanction .= ' - ' . $offense_data['third_sanction'];
-                    
-                    // Update the sanction text with the new total hours
-                    $sanction = preg_replace('/(\d+)\s*hours?/i', $total_hours . ' hours', $sanction);
-                    if (!preg_match('/(\d+)\s*hours?/i', $sanction)) {
-                        $sanction .= " ($total_hours hours)";
-                    }
-                } else {
-                    $total_hours = null;
-                }
-            }
-        }
-=======
->>>>>>> parent of 9250123 (Refactor sanction handling and UI updates for violation reports)
 
         // Insert new violation report
         $query = "INSERT INTO violation_reports (
