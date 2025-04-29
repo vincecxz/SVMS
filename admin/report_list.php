@@ -285,6 +285,9 @@ include('../config/database.php');
                                 <div class="card-header">
                                     <h3 class="card-title">List of Violation Reports</h3>
                                     <div class="card-tools">
+                                        <button type="button" class="btn btn-success btn-sm" id="exportExcelBtn">
+                                            <i class="fas fa-file-excel"></i> Export to Excel
+                                        </button>
                                         <div class="input-group input-group-sm" style="width: 150px;">
                                             
                                         </div>
@@ -374,11 +377,7 @@ include('../config/database.php');
                                                 echo "<td><span class='badge badge-".
                                                     ($row['status'] == 'Active' ? 'danger' : 
                                                     ($row['status'] == 'In Progress' ? 'orange' : 'success'))."'>".$row['status']."</span></td>";
-                                                echo "<td>
-                                                    <div class='action-buttons-wrapper'>
-                                                        <button class='btn btn-sm btn-primary view-report' data-id='".$row['id']."'><i class='fas fa-eye'></i></button>
-                                                        <button class='btn btn-sm btn-warning edit-report' data-id='".$row['id']."'><i class='fas fa-edit'></i></button>
-                                                        <button class='btn btn-sm btn-success update-status' data-id='".$row['id']."' ".(($row['status'] != 'Active' && $row['status'] != 'In Progress') ? 'disabled' : '')."><i class='fas fa-check'></i></button>";
+                                                echo "<td>\n    <div class='action-buttons-wrapper'>\n        <button class='btn btn-sm btn-primary view-report' data-id='".$row['id']."'><i class='fas fa-eye'></i></button>\n        <button class='btn btn-sm btn-warning edit-report' data-id='".$row['id']."'><i class='fas fa-edit'></i></button>\n        <button class='btn btn-sm btn-success update-status' data-id='".$row['id']."' ".(($row['status'] != 'Active' && $row['status'] != 'In Progress') ? 'disabled' : '')."><i class='fas fa-check'></i></button>\n        <button class='btn btn-sm btn-danger delete-report' data-id='".$row['id']."'><i class='fas fa-trash'></i></button>";
                                                 
                                                 // Add progress tracking button for community service sanctions
                                                 // Check if this is a first offense with community service or if there's an active first offense
@@ -856,6 +855,42 @@ include('../config/database.php');
             <i class="fas fa-plus"></i>
             <span class="btn-float-label">Add Report</span>
         </button>
+
+        <!-- Export Options Modal -->
+        <div class="modal fade" id="exportOptionsModal" tabindex="-1" role="dialog">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Export Options</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <form method="post" action="export_violation_reports.php">
+                        <div class="modal-body">
+                            <div class="form-group">
+                                <label>Sort By</label>
+                                <select class="form-control" name="sort_by" required>
+                                    <option value="name">Student Name</option>
+                                    <option value="date">Date and Time</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Sort Order</label>
+                                <select class="form-control" name="sort_order" required>
+                                    <option value="asc">Ascending</option>
+                                    <option value="desc">Descending</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                            <button type="submit" class="btn btn-success">Export</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
 
         <?php include('../includes/admin/footer.php'); ?>
     </div>
@@ -2207,6 +2242,58 @@ include('../config/database.php');
                     $('#service_hours').val(hours);
                 }
             });
+        });
+
+        // Handle delete report button click
+        $('#reportsTable').on('click', '.delete-report', function() {
+            const id = $(this).data('id');
+            Swal.fire({
+                title: 'Are you sure?',
+                text: 'This will permanently delete the violation report.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Yes, delete it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: 'delete_violation.php',
+                        method: 'POST',
+                        data: { id: id },
+                        dataType: 'json',
+                        success: function(response) {
+                            if (response.success) {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Deleted!',
+                                    text: 'Violation report has been deleted.'
+                                }).then(() => {
+                                    location.reload();
+                                });
+                            } else {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Error',
+                                    text: response.message || 'Failed to delete violation report.'
+                                });
+                            }
+                        },
+                        error: function(xhr, status, error) {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: 'An error occurred while deleting the violation report.'
+                            });
+                        }
+                    });
+                }
+            });
+        });
+
+        // Handle Export to Excel button click
+        $('#exportExcelBtn').click(function() {
+            $('#exportOptionsModal').modal('show');
         });
     });
     </script>
