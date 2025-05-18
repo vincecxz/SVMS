@@ -591,7 +591,7 @@ include('../config/database.php');
                                     <div class="form-group mb-3" id="service_hours_container" style="display: none;">
                                         <label class="font-weight-bold">University Service Hours</label>
                                         <div class="input-group">
-                                            <input type="number" class="form-control" id="service_hours" name="service_hours" min="1">
+                                            <input type="number" class="form-control" id="service_hours" name="service_hours" min="0">
                                             <div class="input-group-append">
                                                 <span class="input-group-text">hours</span>
                                             </div>
@@ -718,7 +718,7 @@ include('../config/database.php');
                                     <div class="form-group mb-3" id="edit_service_hours_container" style="display: none;">
                                         <label class="font-weight-bold">University Service Hours</label>
                                         <div class="input-group">
-                                            <input type="number" class="form-control" id="edit_service_hours" name="service_hours" min="1">
+                                            <input type="number" class="form-control" id="edit_service_hours" name="service_hours" min="0">
                                             <div class="input-group-append">
                                                 <span class="input-group-text">hours</span>
                                             </div>
